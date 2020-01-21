@@ -1,0 +1,44 @@
+Installed Ganache for windows
+Installed Node + npm combo for windows
+Install VS Code w/ Terminal, Solidity, React/Redux shortcuts, browser preview externsions
+Created github acct and downloaded github desktop and set up the repo on a dropbox folder
+
+Enable PowerShell perms
+https://stackoverflow.com/questions/16460163/ps1-cannot-be-loaded-because-the-execution-of-scripts-is-disabled-on-this-syste
+
+Create Project
+https://medium.com/backticks-tildes/setting-up-a-redux-project-with-create-react-app-e363ab2329b8
+
+Install Material UI
+https://material-ui.com/
+
+Set Up Upload Component
+https://programmingwithmosh.com/javascript/react-file-upload-proper-server-side-nodejs-easy/
+
+Set Up React Dev Tool
+https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi
+
+npm install web3
+
+npm install -g solc@0.5
+
+get windows solc 0.5
+https://github.com/ethereum/solidity/releases
+
+C:\Users\James\Desktop\solidity-windows>solc.exe --abi C:\Users\James\Dropbox\current_projects\attester\attester\src\contracts\DocStore.sol  -o ./out
+
+get infuria node connect info
+https://infura.io/
+
+INFO - NONCE COUNT:
+https://github.com/ethereum/go-ethereum/issues/2880
+
+For web3 transactions:
+npm install typescript
+npm install ethereumjs-tx
+
+npm install fsevents
+npm install crypto-js
+
+npm install @material-ui/core
+npm install @material-ui/icons
