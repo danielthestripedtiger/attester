@@ -275,7 +275,7 @@ onClickHandler=event=>{
     <Button color="inherit">Login</Button>
   </Toolbar>
 </AppBar>
-     <br/><br/><br/><br/><br/><br/><br/><br/>
+     <br/>
       <Typography variant="h4" component="h4" gutterBottom>
       Ethereum Blockchain Document Attestation
 
