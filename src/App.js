@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Box from '@material-ui/core/Box';
+import Alert from '@material-ui/lab/Alert';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -115,7 +116,7 @@ class App extends React.Component {
 
     if (window.ethereum) {
       myWeb3 = new Web3(Web3.givenProvider);
-    }
+    
 
 
 
@@ -237,6 +238,15 @@ class App extends React.Component {
     //             console.log('Successfully unsubscribed!');
     //     });
     // }
+  } else{
+    var mmMissingMsg = <Alert severity="error"><center><div>This website Uses MetaMask and you dont seem to have it installed. Please install MetaMask and fill your account with sufficient Ether: <a href="https://metamask.io/">https://metamask.io</a></div></center></Alert>;
+    
+    this.setState(
+      {
+        metamaskWarning: mmMissingMsg
+      }
+    );
+  }
   }
 
   constructor(props) {
@@ -249,7 +259,8 @@ class App extends React.Component {
       // pk_input: null,
       selectedAccount: account,
       estimatedGas: 0,
-      processingFile: "false"
+      processingFile: "false",
+      metamaskWarning: ""
     }
     // this.setState = this.setState.bind(this);
   }
@@ -494,11 +505,17 @@ class App extends React.Component {
         </AppBar>
         <br />
         <Grid container spacing={3}>
+        <Grid item xs={3}></Grid>
+        <Grid item xs={6} align='center' justify='center'>
+        {this.state.metamaskWarning}
+        </Grid>
+        <Grid item xs={3}></Grid>
         <Grid item xs={2}></Grid>
     
           <Grid item xs={8}>
-          <center> <b>Description: </b>Use this tool to store your an arbitrary document on the Ethereum Blockchain. 
-          <br/><br/>If file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later).
+          <center> <b>Description: </b>Use this tool to store your an arbitrary document on the Ethereum Blockchain
+          <br/><br/>If the file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later)
+
           </center>
 </Grid>
 <Grid item xs={2}></Grid>
@@ -541,7 +558,7 @@ class App extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' justify='center'>
-            File Selected: {this.state.selectedFileName}
+          File Selected: {this.state.selectedFileName}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
@@ -556,12 +573,12 @@ class App extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' justify='center'>
-          Total Gas Cost in Ether: { this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))}
+          Total Gas Cost in Ether: { this.state.web3 == null ? this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether')): "0"}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' justify='center'>
-          Total Gas Cost in USD: { "$" + ((this.state.etherPrice * this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))).toFixed(2))}
+          Total Gas Cost in USD: { this.state.web3 == null ? "$" + ((this.state.etherPrice * this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))).toFixed(2)): "$0"}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
@@ -570,7 +587,7 @@ class App extends React.Component {
               <Button variant="outlined" component="span" onClick={this.onClickHandler} 
               className={classes.button}
               startIcon={<CloudUploadIcon />}>
-                Upload
+                Save to Ethereum
         </Button>
             </label>
           </Grid>
@@ -590,7 +607,7 @@ class App extends React.Component {
             <a href="#">Manage Previously Uploaded Documents</a>
           </Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={12} align='center' justify='center'><br/><br/><br/><br/>(c) 2020 Renewal Systems</Grid>
+          <Grid item xs={12} align='center' justify='center'><br/><br/><br/><br/>© 2020 Renewal Systems, Inc. All rights reserved.</Grid>
         </Grid>
       </div>
     );

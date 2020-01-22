@@ -46,3 +46,4 @@ npm install @material-ui/icons
 npm i axios
 npm install --save-dev http-proxy-middleware
 npm install --save react-dropzone
+npm install @material-ui/lab
