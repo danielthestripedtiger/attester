@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
@@ -13,6 +14,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import Dropzone from 'react-dropzone'
 var http = require('http');
 
 const Web3 = require('web3');
@@ -46,7 +49,6 @@ const styles = theme => ({
 var provider = "";
 var myWeb3 = "";
 var account = "";
-var myWeb3 = "";
 var thisContract = "";
 var totalGasCost = "";
 var filePartsCount = "";
@@ -72,14 +74,28 @@ const abi = [{ "constant": true, "inputs": [{ "internalType": "bytes32", "name":
 //   fs.writeFileSync(file, bitmap);
 //   console.log('******** File created from base64 encoded string ********');
 // }
-
-
+if (window.ethereum) {
+  myWeb3 = new Web3(Web3.givenProvider);
+}
 
 
 class App extends React.Component {
 
   componentDidMount() {
     console.log("In CDM");
+
+
+    // const script = document.createElement("script");
+    // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
+    // script.async = true;
+  
+    // document.body.appendChild(script);
+
+    axios.get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
+    .then(res => {
+      console.log(res.data[0].price_usd);
+      this.setState({ etherPrice: res.data[0].price_usd });
+    });
 
     // http.get({
     //   host: 'min-api.cryptocompare.com',
@@ -110,24 +126,24 @@ class App extends React.Component {
 
 
 
-    var subscription = myWeb3.eth.subscribe('logs', {
-      address: '0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763', fromBlock: 2,
-      topics: ['0x296ba4ca62c6c21c95e828080cb8aec7481b71390585605300a8a76f9e95b527']
-    }, function (error, result) {
-      if (!error)
-        console.log("Res: " + myWeb3.utils.toBN(result.data));
-    })
-      .on("data", function (log) {
-        console.log(log.data);
-      })
-      .on("changed", function (log) {
-      });
+    // var subscription = myWeb3.eth.subscribe('logs', {
+    //   address: '0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763', fromBlock: 2,
+    //   topics: ['0x296ba4ca62c6c21c95e828080cb8aec7481b71390585605300a8a76f9e95b527']
+    // }, function (error, result) {
+    //   if (!error)
+    //     console.log("Res: " + myWeb3.utils.toBN(result.data));
+    // })
+    //   .on("data", function (log) {
+    //     console.log(log.data);
+    //   })
+    //   .on("changed", function (log) {
+    //   });
 
-    // unsubscribes the subscription
-    subscription.unsubscribe(function (error, success) {
-      if (success)
-        console.log('Successfully unsubscribed!');
-    });
+    // // unsubscribes the subscription
+    // subscription.unsubscribe(function (error, success) {
+    //   if (success)
+    //     console.log('Successfully unsubscribed!');
+    // });
 
     // window.addEventListener('load', async () => {
     // Modern dapp browsers...
@@ -179,7 +195,7 @@ class App extends React.Component {
     console.log('Creating contract instance');
     thisContract = new myWeb3.eth.Contract(abi, "0xff36e0c5d31185bEBa93C31B1d6C9c9e9E17A134");
     console.log("This contract: " + thisContract);
-    this.setState({ contract: thisContract });
+    this.setState({ contract: thisContract, processingFile: "false"});
 
     // var abi2 = [{"inputs":[{"internalType":"address","name":"src_","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":true,"inputs":[{"indexed":true,"internalType":"bytes4","name":"sig","type":"bytes4"},{"indexed":true,"internalType":"address","name":"usr","type":"address"},{"indexed":true,"internalType":"bytes32","name":"arg1","type":"bytes32"},{"indexed":true,"internalType":"bytes32","name":"arg2","type":"bytes32"},{"indexed":false,"internalType":"bytes","name":"data","type":"bytes"}],"name":"LogNote","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"val","type":"bytes32"}],"name":"LogValue","type":"event"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"bud","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"src_","type":"address"}],"name":"change","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"}],"name":"deny","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address[]","name":"a","type":"address[]"}],"name":"diss","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"a","type":"address"}],"name":"diss","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"hop","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address[]","name":"a","type":"address[]"}],"name":"kiss","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"a","type":"address"}],"name":"kiss","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"pass","outputs":[{"internalType":"bool","name":"ok","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"peek","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"peep","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"poke","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"read","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"}],"name":"rely","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"src","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"start","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint16","name":"ts","type":"uint16"}],"name":"step","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"stop","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"stopped","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"void","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"wards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"zzz","outputs":[{"internalType":"uint64","name":"","type":"uint64"}],"payable":false,"stateMutability":"view","type":"function"}]
     // var thisContract2 = new myWeb3.eth.Contract(abi2,"0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763");
@@ -227,26 +243,30 @@ class App extends React.Component {
     super(props);
     this.state = {
       selectedFile: null,
+      selectedFileName: "",
       contract: thisContract,
       web3: myWeb3,
       // pk_input: null,
-      selectedAccount: account
+      selectedAccount: account,
+      estimatedGas: 0,
+      processingFile: "false"
     }
     // this.setState = this.setState.bind(this);
   }
 
 
 
-  onChangeHandler = event => {
+  onDrop = (acceptedFiles) => {
 
-    console.log(event.target.files[0])
+    console.log(acceptedFiles[0])
     this.setState({
-      selectedFile: event.target.files[0],
-      loaded: 0,
+      selectedFileName: acceptedFiles[0].name,
+      selectedFile: acceptedFiles[0],
+      processingFile: "true"
     })
 
     // console.log(Buffer.from(this.state.selectedFile));
-    const fileAsBlob = new Blob([event.target.files[0]]);
+    const fileAsBlob = new Blob([acceptedFiles[0]]);
 
     console.log(fileAsBlob);
 
@@ -313,14 +333,15 @@ class App extends React.Component {
             sliceEnd += 1024;
             nonceVal++;
           }
-
+          componentVar.setState({
+            processingFile: "false"
+          })
         }
         );
 
 
     }
     )
-
 
 
 
@@ -423,7 +444,9 @@ class App extends React.Component {
 
   // }
 
-
+  // onDrop = (acceptedFiles) => {
+  //   console.log(acceptedFiles);
+  // }
 
 
   render() {
@@ -438,6 +461,8 @@ class App extends React.Component {
 
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.css" />
         <AppBar position="static">
           {/* <Toolbar>
     {/* <IconButton edge="start" 
@@ -457,7 +482,7 @@ class App extends React.Component {
             </Grid>
             <Grid item xs={1}>Home</Grid>
             <Grid item xs={1}>Uploads</Grid>
-            <Grid item xs={1}></Grid>
+            <Grid item xs={1}>Ether Price: {this.state.etherPrice}</Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={1}></Grid>
             <Grid item xs={1}></Grid>
@@ -481,11 +506,44 @@ class App extends React.Component {
 <Grid item xs={2}></Grid>
 <Grid item xs={2}></Grid>
           <Grid item xs={8}>
+          <Box border={1}>
+            
 <center>
-            <input className={classes.root} type="file" name="file" onChange={this.onChangeHandler} /></center>
-            <br/>
-            <br/>
-            <br/>
+<Dropzone
+        onDrop={this.onDrop}
+        minSize={0}
+        maxSize="50000000000"
+      >
+        {({getRootProps, getInputProps, isDragActive, isDragReject, rejectedFiles}) => {
+          const isFileTooLarge = rejectedFiles.length > 0 && rejectedFiles[0].size > 50000000000;
+          return (
+            <div {...getRootProps()}>
+              <br/><br/><br/>
+              <input {...getInputProps()} />
+              {!isDragActive && 'Click here or drop a file to upload!'}
+              {isDragActive && !isDragReject && "Drop it like it's hot!"}
+              {isDragReject && "File type not accepted, sorry!"}
+              {isFileTooLarge && (
+                <div className="text-danger mt-2">
+                  File is too large.
+                </div>
+              )}
+              <br/><br/><br/><br/>
+            </div>
+          )}
+        }
+      </Dropzone>
+</center>       
+
+</Box>
+    
+            {/* <input className={classes.root} type="file" name="file" onChange={this.onChangeHandler} /> */}
+
+          </Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8}>
+            File Selected: {this.state.selectedFileName}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
@@ -495,7 +553,17 @@ class App extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8}>
-            Number of file parts: {this.state.noOfFileParts}
+          Number of file parts: {this.state.noOfFileParts}
+          </Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8}>
+          Total Gas Cost in Ether: { this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))}
+          </Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8}>
+          Total Gas Cost in USD: { "$" + ((this.state.etherPrice * this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))).toFixed(2))}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
@@ -507,6 +575,12 @@ class App extends React.Component {
             </label>
           </Grid>
           <Grid item xs={2}></Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8}>
+            Processing File: {this.state.processingFile}
+          </Grid>
+          <Grid item xs={2}></Grid>
+
           <Grid item xs={2}></Grid>
           <Grid item xs={8}>
             <br/>
