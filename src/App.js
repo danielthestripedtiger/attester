@@ -116,7 +116,7 @@ class App extends React.Component {
 
     if (window.ethereum) {
       myWeb3 = new Web3(Web3.givenProvider);
-    
+
 
 
 
@@ -255,7 +255,7 @@ class App extends React.Component {
       selectedFile: null,
       selectedFileName: "",
       contract: thisContract,
-      web3: myWeb3,
+      web3: null,
       // pk_input: null,
       selectedAccount: account,
       estimatedGas: 0,
@@ -492,7 +492,7 @@ class App extends React.Component {
 
             </Grid>
 
-            <Grid item xs={12} align='center' justify='center'>
+            <Grid item xs={12} align='center' >
               <ButtonGroup variant="contained"  aria-label="contained primary button group">
   <Button>Home</Button>
   <Button>Uploads</Button>
@@ -506,7 +506,7 @@ class App extends React.Component {
         <br />
         <Grid container spacing={3}>
         <Grid item xs={3}></Grid>
-        <Grid item xs={6} align='center' justify='center'>
+        <Grid item xs={6} align='center' >
         {this.state.metamaskWarning}
         </Grid>
         <Grid item xs={3}></Grid>
@@ -527,7 +527,7 @@ class App extends React.Component {
 <Dropzone
         onDrop={this.onDrop}
         minSize={0}
-        maxSize="50000000000"
+        maxSize={50000000000}
       >
         {({getRootProps, getInputProps, isDragActive, isDragReject, rejectedFiles}) => {
           const isFileTooLarge = rejectedFiles.length > 0 && rejectedFiles[0].size > 50000000000;
@@ -557,32 +557,32 @@ class App extends React.Component {
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
+          <Grid item xs={8} align='center' >
           File Selected: {this.state.selectedFileName}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
+          <Grid item xs={8} align='center' >
           Total Estimated Gas Cost: {this.state.estimatedGas}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
+          <Grid item xs={8} align='center' >
           Number of file parts: {this.state.noOfFileParts}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
-          Total Gas Cost in Ether: { this.state.web3 == null ? this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether')): "0"}
+          <Grid item xs={8} align='center' >
+          Total Gas Cost in Ether: { this.state.web3 == null ? "0" : this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether')) }
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
-          Total Gas Cost in USD: { this.state.web3 == null ? "$" + ((this.state.etherPrice * this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))).toFixed(2)): "$0"}
+          <Grid item xs={8} align='center' >
+          Total Gas Cost in USD: { this.state.web3 == null ? "$0" : "$" + ((this.state.etherPrice * this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))).toFixed(2))}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
+          <Grid item xs={8} align='center' >
             <label htmlFor="outlined-button-file">
               <Button variant="outlined" component="span" onClick={this.onClickHandler} 
               className={classes.button}
@@ -593,13 +593,13 @@ class App extends React.Component {
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
+          <Grid item xs={8} align='center' >
             Processing File: {this.state.processingFile}
           </Grid>
           <Grid item xs={2}></Grid>
 
           <Grid item xs={2}></Grid>
-          <Grid item xs={8} align='center' justify='center'>
+          <Grid item xs={8} align='center' >
             <br/>
             <br/>
             <br/>
@@ -607,7 +607,7 @@ class App extends React.Component {
             <a href="#">Manage Previously Uploaded Documents</a>
           </Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={12} align='center' justify='center'><br/><br/><br/><br/>© 2020 Renewal Systems, Inc. All rights reserved.</Grid>
+          <Grid item xs={12} align='center' ><br/><br/><br/><br/>© 2020 Renewal Systems, Inc. All rights reserved.</Grid>
         </Grid>
       </div>
     );
