@@ -5,8 +5,8 @@ import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import ButtonBase from '@material-ui/core/ButtonBase';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import { withStyles } from '@material-ui/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -480,18 +480,15 @@ class App extends React.Component {
               <Paper ><b>Account:  {this.state.selectedAccount}</b></Paper>
 
             </Grid>
-            <Grid item xs={1}>Home</Grid>
-            <Grid item xs={1}>Uploads</Grid>
-            <Grid item xs={1}>Ether Price: {this.state.etherPrice}</Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
-            <Grid item xs={1}></Grid>
+
+            <Grid item xs={12} align='center' justify='center'>
+              <ButtonGroup variant="contained"  aria-label="contained primary button group">
+  <Button>Home</Button>
+  <Button>Uploads</Button>
+
+</ButtonGroup><br/><br/></Grid>
+            
+           
           </Grid>
 
         </AppBar>
@@ -500,7 +497,8 @@ class App extends React.Component {
         <Grid item xs={2}></Grid>
     
           <Grid item xs={8}>
-          <center> <b>Description: </b>Use this tool to store your document and/or proof of document on the Ethereum Blockchain
+          <center> <b>Description: </b>Use this tool to store your an arbitrary document on the Ethereum Blockchain. 
+          <br/><br/>If file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later).
           </center>
 </Grid>
 <Grid item xs={2}></Grid>
@@ -542,47 +540,49 @@ class App extends React.Component {
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
             File Selected: {this.state.selectedFileName}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
           Total Estimated Gas Cost: {this.state.estimatedGas}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
           Number of file parts: {this.state.noOfFileParts}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
           Total Gas Cost in Ether: { this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
           Total Gas Cost in USD: { "$" + ((this.state.etherPrice * this.state.web3.utils.fromWei(String(2000000000 * this.state.estimatedGas, 'ether'))).toFixed(2))}
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
             <label htmlFor="outlined-button-file">
-              <Button variant="outlined" component="span" onClick={this.onClickHandler}>
+              <Button variant="outlined" component="span" onClick={this.onClickHandler} 
+              className={classes.button}
+              startIcon={<CloudUploadIcon />}>
                 Upload
         </Button>
             </label>
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
             Processing File: {this.state.processingFile}
           </Grid>
           <Grid item xs={2}></Grid>
 
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' justify='center'>
             <br/>
             <br/>
             <br/>
@@ -590,6 +590,7 @@ class App extends React.Component {
             <a href="#">Manage Previously Uploaded Documents</a>
           </Grid>
           <Grid item xs={2}></Grid>
+          <Grid item xs={12} align='center' justify='center'><br/><br/><br/><br/>(c) 2020 Renewal Systems</Grid>
         </Grid>
       </div>
     );
