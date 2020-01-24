@@ -20,93 +20,8 @@ var account = "";
 var thisContract = "";
 var totalGasCost = "";
 var filePartsCount = "";
-const abi = [
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"name": "docBins",
-		"outputs": [
-			{
-				"name": "slot",
-				"type": "string"
-			},
-			{
-				"name": "docLabel",
-				"type": "string"
-			},
-			{
-				"name": "docHash",
-				"type": "bytes32"
-			},
-			{
-				"name": "docBin",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "slot",
-				"type": "string"
-			}
-		],
-		"name": "getDoc",
-		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "bytes32"
-			},
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "storageContainer",
-				"type": "string"
-			},
-			{
-				"name": "slot",
-				"type": "string"
-			},
-			{
-				"name": "docLabel",
-				"type": "string"
-			}
-		],
-		"name": "storeBin",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
-]
-const contractAddress = "0x11FEc9119cb81053b4BC304441243f413443b0d0";
+const abi = [{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"docBins","outputs":[{"internalType":"string","name":"slot","type":"string"},{"internalType":"string","name":"docLabel","type":"string"},{"internalType":"bytes32","name":"docHash","type":"bytes32"},{"internalType":"string","name":"docBin","type":"string"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"string","name":"slot","type":"string"}],"name":"getDoc","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"string","name":"storageContainer","type":"string"},{"internalType":"string","name":"slot","type":"string"},{"internalType":"string","name":"docLabel","type":"string"}],"name":"storeBin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
+const contractAddress = "0xdea87d2cc5c346e659f68ca6e102e1876cf88a79";
 var http = require('http');
 const Web3 = require('web3');
 const fs = require('fs');
@@ -233,6 +148,7 @@ class Uploads extends Component {
                       console.log(resp[1]); 
                       console.log(resp[2]); 
                       console.log(resp[3]); 
+                      console.log(resp[4]); 
                    })
                   }
                 });

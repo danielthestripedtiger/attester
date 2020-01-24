@@ -7,6 +7,7 @@ contract DocStore
         string docLabel;
         bytes32 docHash;
         string docBin;
+        uint timestamp;
     }
 
   mapping(bytes32 => DocData) public docBins;
@@ -22,7 +23,7 @@ string docBin;
         bytes32 key = keccak256(append(msg.sender,slot));
         docBin = storageContainer;
         docHash = keccak256(abi.encodePacked(storageContainer));
-        DocData memory  d = DocData(slot, docLabel, docHash, docBin);
+        DocData memory  d = DocData(slot, docLabel, docHash, docBin, now);
 
         docBins[key] = d;
 
@@ -34,11 +35,12 @@ string docBin;
 
 }
 
- function getDoc(string memory slot) public view returns( string memory, string memory, bytes32, string memory){
+ function getDoc(string memory slot) public view returns( string memory, string memory, bytes32, string memory, uint){
     return ( docBins[keccak256(append(msg.sender,slot))].slot,
     docBins[keccak256(append(msg.sender,slot))].docLabel,
     docBins[keccak256(append(msg.sender,slot))].docHash,
-    docBins[keccak256(append(msg.sender,slot))].docBin);
+    docBins[keccak256(append(msg.sender,slot))].docBin,
+    docBins[keccak256(append(msg.sender,slot))].timestamp);
 }
 
 }

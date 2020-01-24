@@ -25,7 +25,8 @@ npm install -g solc@0.5
 get windows solc 0.5
 https://github.com/ethereum/solidity/releases
 
-C:\Users\James\Desktop\solidity-windows>solc.exe --abi C:\Users\James\Dropbox\current_projects\attester\attester\src\contracts\DocStore.sol  -o ./out
+cd C:\Users\James\Dropbox\current_projects\attester\src\contracts
+solc.exe --abi --overwrite ./DocStore.sol  -o ./out 
 
 get infuria node connect info
 https://infura.io/
