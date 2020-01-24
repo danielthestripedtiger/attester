@@ -49,8 +49,93 @@ var account = "";
 var thisContract = "";
 var totalGasCost = "";
 var filePartsCount = "";
-const abi = [{ "constant": true, "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "name": "docBins", "outputs": [{ "internalType": "string", "name": "slot", "type": "string" }, { "internalType": "string", "name": "docLabel", "type": "string" }, { "internalType": "bytes32", "name": "docHash", "type": "bytes32" }, { "internalType": "string", "name": "docBin", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "internalType": "string", "name": "slot", "type": "string" }], "name": "getDoc", "outputs": [{ "internalType": "string", "name": "", "type": "string" }, { "internalType": "string", "name": "", "type": "string" }, { "internalType": "bytes32", "name": "", "type": "bytes32" }, { "internalType": "string", "name": "", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "string", "name": "storageContainer", "type": "string" }, { "internalType": "string", "name": "slot", "type": "string" }, { "internalType": "string", "name": "docLabel", "type": "string" }], "name": "storeBin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }]
-
+const abi = [
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"name": "docBins",
+		"outputs": [
+			{
+				"name": "slot",
+				"type": "string"
+			},
+			{
+				"name": "docLabel",
+				"type": "string"
+			},
+			{
+				"name": "docHash",
+				"type": "bytes32"
+			},
+			{
+				"name": "docBin",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "slot",
+				"type": "string"
+			}
+		],
+		"name": "getDoc",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "bytes32"
+			},
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "storageContainer",
+				"type": "string"
+			},
+			{
+				"name": "slot",
+				"type": "string"
+			},
+			{
+				"name": "docLabel",
+				"type": "string"
+			}
+		],
+		"name": "storeBin",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
+const contractAddress = "0x11FEc9119cb81053b4BC304441243f413443b0d0";
 //     // function to encode file data to base64 encoded string
 // function base64_encode(file) {
 //   // read binary data
@@ -151,7 +236,7 @@ class Home extends React.Component {
       // });
 
       console.log('Creating contract instance');
-      thisContract = new myWeb3.eth.Contract(abi, "0xff36e0c5d31185bEBa93C31B1d6C9c9e9E17A134");
+      thisContract = new myWeb3.eth.Contract(abi, contractAddress);
       console.log("This contract: " + thisContract);
       this.setState({ contract: thisContract, processingFile: "false" });
 
@@ -280,7 +365,7 @@ class Home extends React.Component {
 
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
-            this.state.contract.methods.storeBin(base64str, "1", "File1")
+            this.state.contract.methods.storeBin(base64str, x.toString(), "File1")
               .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(console.log);
 
             //   var contractObject;
