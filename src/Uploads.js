@@ -6,7 +6,7 @@ export default class Footer extends Component {
         return (
             <div>
                 <Grid container spacing={3}>
-                    <Grid item xs={12} align='center' ><br /><br /><br /><br />Made by <a href='https://github.com/danielthestripedtiger'>Daniel Striped Tiger</a> 🐯</Grid>
+                    <Grid item xs={12} align='center' ><br /><br /><br /><br />Uploads go here</Grid>
                 </Grid>
             </div>
         )

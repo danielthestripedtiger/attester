@@ -47,3 +47,13 @@ npm i axios
 npm install --save-dev http-proxy-middleware
 npm install --save react-dropzone
 npm install @material-ui/lab
+npm install react-router-dom
+npm install redux-devtools-extension
+npm install redux-logger
+
+=====
+IF INSTALLS FAIL, TRY (in PowerShell):
+Remove-Item ./node_modules -Recurse -Force
+npm cache clean --force
+Remove-Item package-lock.json
+npm install
