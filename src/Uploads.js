@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button';
 import Footer from './Footer';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import Alert from '@material-ui/lab/Alert';
 
 var provider = "";
 var myWeb3 = "";
@@ -143,19 +144,33 @@ class Uploads extends Component {
             }
             this.setState({ selectedAccount: account });
           
-          }
-          // // Legacy dapp browsers...
+                   // // Legacy dapp browsers...
           // else if (window.web3) {
           //   window.web3 = new Web3(window.web3.currentProvider);
           //   // Acccounts always exposed
     
-          // }
-          // Non-dapp browsers...
-          else {
-            console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-          }
-          // });
+          console.log('Creating contract instance');
+          thisContract = new myWeb3.eth.Contract(abi, "0xff36e0c5d31185bEBa93C31B1d6C9c9e9E17A134");
+          console.log("This contract: " + thisContract);
+          this.setState({ contract: thisContract, processingFile: "false" });
+    
+          
+          thisContract.methods.getDoc("0").call().then(function(resp) {
+            console.log(resp[0]); 
+            console.log(resp[1]); 
+            console.log(resp[2]); 
+            console.log(resp[3]); 
+         })
+        } else {
+          var mmMissingMsg = <Alert severity="error"><center><div>This website Uses MetaMask and you dont seem to have it installed. Please install MetaMask and fill your account with sufficient Ether: <a href="https://metamask.io/">https://metamask.io</a></div></center></Alert>;
+    
+          this.setState(
+            {
+              metamaskWarning: mmMissingMsg
+            }
+          );
         }
+      }
 
         constructor(props) {
             super(props);
@@ -176,9 +191,10 @@ class Uploads extends Component {
          const {classes} = this.props;
         return (
         <div>
-
+    <p>Contract String: {this.state.contract.name}</p>
       <TableContainer className={classes.tableContainer} component={Paper}>
         <center><h3 className={classes.table}>Uploads for account: {this.state.selectedAccount}</h3></center>
+    
         <Table size="small" 
          className={classes.table} 
         aria-label="customized table">

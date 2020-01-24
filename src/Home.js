@@ -208,7 +208,7 @@ class Home extends React.Component {
       var sliceStart = 0;
       var sliceEnd = 1024;
 
-      var nonceVal = this.state.web3.eth.getTransactionCount("0x9e5E9d4c66970e5669C88cBe969eA10b9433c786")
+      var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
         .then(nonceVal => {
 
           console.log("nonce1: " + nonceVal);
@@ -220,7 +220,7 @@ class Home extends React.Component {
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
             // console.log(base64str);
-            this.state.contract.methods.storeBin(base64str, "1", "File1").estimateGas(
+            this.state.contract.methods.storeBin(base64str, x.toString(), "File1").estimateGas(
               {
                 from: account,
                 gasPrice: "2000000000",
@@ -271,7 +271,7 @@ class Home extends React.Component {
       var sliceStart = 0;
       var sliceEnd = 1024;
 
-      var nonceVal = this.state.web3.eth.getTransactionCount("0x9e5E9d4c66970e5669C88cBe969eA10b9433c786")
+      var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
         .then(nonceVal => {
 
           console.log("nonce2: " + nonceVal);
