@@ -10,6 +10,20 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Footer from './Footer';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+
+var provider = "";
+var myWeb3 = "";
+var account = "";
+var thisContract = "";
+var totalGasCost = "";
+var filePartsCount = "";
+const abi = [{ "constant": true, "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "name": "docBins", "outputs": [{ "internalType": "string", "name": "slot", "type": "string" }, { "internalType": "string", "name": "docLabel", "type": "string" }, { "internalType": "bytes32", "name": "docHash", "type": "bytes32" }, { "internalType": "string", "name": "docBin", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "internalType": "string", "name": "slot", "type": "string" }], "name": "getDoc", "outputs": [{ "internalType": "string", "name": "", "type": "string" }, { "internalType": "string", "name": "", "type": "string" }, { "internalType": "bytes32", "name": "", "type": "bytes32" }, { "internalType": "string", "name": "", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "string", "name": "storageContainer", "type": "string" }, { "internalType": "string", "name": "slot", "type": "string" }, { "internalType": "string", "name": "docLabel", "type": "string" }], "name": "storeBin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }]
+var http = require('http');
+const Web3 = require('web3');
+const fs = require('fs');
+var CryptoJS = require("crypto-js");
 
 const StyledTableCell = withStyles(theme => ({
     head: {
@@ -39,7 +53,7 @@ const StyledTableCell = withStyles(theme => ({
     <Button  variant="contained" color="primary">Delete</Button>),
   ];
   
-  const useStyles = makeStyles({
+  const useStyles = {
     table: {
     //   minWidth: 700,
     height: '80%',
@@ -51,22 +65,123 @@ const StyledTableCell = withStyles(theme => ({
         height: '100%',
         width: '95%',
           margin: '20px'
-        },
+        }
 // div: {
 //   margin: '70px',
 //   border: '1px solid #4CAF50'
 // }
- } );
-  
-  export default function Uploads() {
-    const classes = useStyles();
+ } ;
+
+class Uploads extends Component {
+ 
+    componentDidMount() {
+        console.log("In CDM");
+    
+    
+        // const script = document.createElement("script");
+        // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
+        // script.async = true;
+    
+        // document.body.appendChild(script);
+    
+        axios.get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
+          .then(res => {
+            console.log(res.data[0].price_usd);
+            this.setState({ etherPrice: res.data[0].price_usd });
+          });
+    
+        if (window.ethereum) {
+      
+          // var subscription = myWeb3.eth.subscribe('logs', {
+          //   address: '0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763', fromBlock: 2,
+          //   topics: ['0x296ba4ca62c6c21c95e828080cb8aec7481b71390585605300a8a76f9e95b527']
+          // }, function (error, result) {
+          //   if (!error)
+          //     console.log("Res: " + myWeb3.utils.toBN(result.data));
+          // })
+          //   .on("data", function (log) {
+          //     console.log(log.data);
+          //   })
+          //   .on("changed", function (log) {
+          //   });
+    
+          // // unsubscribes the subscription
+          // subscription.unsubscribe(function (error, success) {
+          //   if (success)
+          //     console.log('Successfully unsubscribed!');
+          // });
+    
+          // Modern dapp browsers...
+    
+            myWeb3 = new Web3(Web3.givenProvider);
+            // storeWeb3(myWeb3);
+            this.setState({ web3: myWeb3 });
+            // store.web3 = myWeb3;
+            try {
+              // Request account access if needed
+              window.ethereum.enable();
+    
+              var componentVar = this;
+              var accountInterval = setInterval(() => {
+                // console.log("In internal");
+                var currentAccount = "";
+                myWeb3.eth.getAccounts().then(function (result) {
+                  currentAccount = result[0];
+    
+                  // console.log("Current Account: " + currentAccount);
+                  if (currentAccount !== account) {
+                    account = currentAccount;
+                    componentVar.setState({ selectedAccount: account });
+                    console.log("Account: " + account);
+                  }
+                });
+    
+    
+              }, 100);
+            } catch (error) {
+              // User denied account access...
+            }
+            this.setState({ selectedAccount: account });
+          
+          }
+          // // Legacy dapp browsers...
+          // else if (window.web3) {
+          //   window.web3 = new Web3(window.web3.currentProvider);
+          //   // Acccounts always exposed
+    
+          // }
+          // Non-dapp browsers...
+          else {
+            console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+          }
+          // });
+        }
+
+        constructor(props) {
+            super(props);
+            this.state = {
+              selectedFile: null,
+              selectedFileName: "",
+              contract: thisContract,
+              web3: null,
+              // pk_input: null,
+              selectedAccount: account,
+              estimatedGas: 0,
+              processingFile: "false",
+              metamaskWarning: ""
+            }
+          }
   //DocumentName TimeStamp FullDocHash DownloadDocument/Download_NA_HashStoredOnly RemoveFromBlockchain
-    return (
+    render() {
+         const {classes} = this.props;
+        return (
         <div>
 
       <TableContainer className={classes.tableContainer} component={Paper}>
-      <p className={classes.table}>Uploads for this account: </p>
-        <Table size="small" className={classes.table} aria-label="customized table">
+        <center><h3 className={classes.table}>Uploads for account: {this.state.selectedAccount}</h3></center>
+        <Table size="small" 
+         className={classes.table} 
+        aria-label="customized table">
           <TableHead>
             <TableRow>
               <StyledTableCell>Document Name</StyledTableCell>
@@ -94,5 +209,14 @@ const StyledTableCell = withStyles(theme => ({
       </TableContainer>
     <Footer />  
         </div>
+
     );
+            }
   }
+
+  Uploads.propTypes = {
+    classes: PropTypes.object.isRequired,
+  };
+
+   export default withStyles(useStyles)(Uploads);
+//   export default Uploads;
