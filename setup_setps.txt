@@ -26,7 +26,7 @@ get windows solc 0.5
 https://github.com/ethereum/solidity/releases
 
 cd C:\Users\James\Dropbox\current_projects\attester\src\contracts
-solc.exe --abi --overwrite ./DocStore.sol  -o ./out 
+solc.exe --abi --overwrite ./DocStoreV2.sol  -o ./out 
 
 get infuria node connect info
 https://infura.io/
@@ -51,6 +51,7 @@ npm install @material-ui/lab
 npm install react-router-dom
 npm install redux-devtools-extension
 npm install redux-logger
+npm install js-sha3
 
 =====
 IF INSTALLS FAIL, TRY (in PowerShell):

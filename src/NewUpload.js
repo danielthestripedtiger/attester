@@ -11,14 +11,12 @@ import axios from 'axios';
 import Dropzone from 'react-dropzone'
 import Footer from './Footer'
 import { connect } from 'react-redux'
-import { storeWeb3 } from './redux'
 
+const sha3_512 = require('js-sha3').sha3_512;
 var http = require('http');
 const Web3 = require('web3');
 const fs = require('fs');
 var CryptoJS = require("crypto-js");
-
-
 
 const styles = theme => ({
   root: {
@@ -49,8 +47,8 @@ var account = "";
 var thisContract = "";
 var totalGasCost = "";
 var filePartsCount = "";
-const abi = [{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"docBins","outputs":[{"internalType":"string","name":"slot","type":"string"},{"internalType":"string","name":"docLabel","type":"string"},{"internalType":"bytes32","name":"docHash","type":"bytes32"},{"internalType":"string","name":"docBin","type":"string"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"string","name":"slot","type":"string"}],"name":"getDoc","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"string","name":"storageContainer","type":"string"},{"internalType":"string","name":"slot","type":"string"},{"internalType":"string","name":"docLabel","type":"string"}],"name":"storeBin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
-const contractAddress = "0xdea87d2cc5c346e659f68ca6e102e1876cf88a79";
+const abi = [{"constant":true,"inputs":[{"internalType":"string","name":"a","type":"string"},{"internalType":"string","name":"b","type":"string"}],"name":"compareStrings","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"docBins","outputs":[{"internalType":"string","name":"docLabel","type":"string"},{"internalType":"string","name":"docHash","type":"string"},{"internalType":"uint256","name":"lastUpdated","type":"uint256"},{"internalType":"uint256","name":"docSlot","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"docKeys","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"inpSlot","type":"uint256"}],"name":"getDoc","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string[]","name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"inpSlot","type":"uint256"}],"name":"getDocMetaData","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"string","name":"dataStr","type":"string"},{"internalType":"string","name":"inpDocLabel","type":"string"},{"internalType":"string","name":"inpDocHash","type":"string"},{"internalType":"uint256","name":"argFlag","type":"uint256"}],"name":"storeBin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userSlots","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
+const contractAddress = "0x6309a92fd32003f36ee26705aac7e0e79fd203ce";
 //     // function to encode file data to base64 encoded string
 // function base64_encode(file) {
 //   // read binary data
@@ -219,8 +217,13 @@ class NewUpload extends React.Component {
 
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
+            var addFlag = "0";
+            if(x == 0){
+              addFlag = "1";
+            }
             // console.log(base64str);
-            this.state.contract.methods.storeBin(base64str, x.toString(), acceptedFiles[0].name).estimateGas(
+            //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
+            this.state.contract.methods.storeBin(base64str, acceptedFiles[0].name, sha3_512(fileBuffer),addFlag).estimateGas(
               {
                 from: account,
                 gasPrice: "2000000000",
@@ -280,7 +283,13 @@ class NewUpload extends React.Component {
 
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
-            this.state.contract.methods.storeBin(base64str, x.toString(), this.state.selectedFile.name)
+            var addFlag = "0";
+            if(x === 0){
+              addFlag = "1";
+            }
+            // console.log(base64str);
+            //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
+            this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer),addFlag)
               .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(console.log);
 
             //   var contractObject;

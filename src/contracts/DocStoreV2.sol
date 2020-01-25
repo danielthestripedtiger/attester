@@ -8,33 +8,49 @@ contract DocStore
         string docLabel;
         string docHash;
         uint lastUpdated;
-        uint slot;
+        uint docSlot;
     }
 
     mapping(bytes32 => DocData) public docBins;
     mapping(uint => bytes32) public docKeys;
-    uint public slotsCount = 0;
+    mapping(address => uint) public userSlots;
 
     function storeBin(string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag) public {
         
         // bytes32 data = stringToBytes32(dataStr);
+        // key is sender address + document hash (to be used with docBins map, which contains the file infos)
         bytes32 key = keccak256(append(msg.sender,inpDocHash));
         
+        // explicit add document flag
         if(argFlag == 1){
+            // if the current location of the document key is empty...
             if( compareStrings(docBins[key].docHash, "") ){
-                docKeys[slotsCount] = keccak256(append(msg.sender,inpDocHash));
-                slotsCount++;
+                // .. then set the key into the current user slot (slot is numberic and correclated with a key. To be used for web3 lookups)
+                docKeys[userSlots[msg.sender]] = keccak256(append(msg.sender,inpDocHash));
+                // increment slot number for use with a new key in the future
+                userSlots[msg.sender] = userSlots[msg.sender] + 1;
             } else {
+                // if add flag was specified and there is already data, return it to empty default values
                 delete docBins[key].dataParts;
-                docBins[key].slot = 0;
+                docBins[key].docLabel = "";
+                docBins[key].docHash = "";
+                docBins[key].lastUpdated = 0;
+                docBins[key].docSlot = 0;
             }
-        } 
+        }
         
+        // append data to dataParts string array
         docBins[key].dataParts.push(dataStr);
+        
+        //update fields based on input args
         docBins[key].docLabel = inpDocLabel;
         docBins[key].docHash = inpDocHash;
+        
+        // set current timestamp as last update date
         docBins[key].lastUpdated = now;
-        docBins[key].slot++;
+        
+        // doc slot now taken (logically speaking, after array push), so increment the slot
+        docBins[key].docSlot++;
     }
 
     function append( address a, string memory b) internal pure returns (bytes memory) {
@@ -46,12 +62,19 @@ contract DocStore
     }
 
     function getDoc(uint inpSlot) public view returns( string memory, string memory, uint, string[] memory ){
-        
         return ( 
             docBins[docKeys[inpSlot]].docLabel,
             docBins[docKeys[inpSlot]].docHash,
             docBins[docKeys[inpSlot]].lastUpdated,
             docBins[docKeys[inpSlot]].dataParts
+            );
+    }
+    
+    function getDocMetaData(uint inpSlot) public view returns( string memory, string memory, uint){
+        return ( 
+            docBins[docKeys[inpSlot]].docLabel,
+            docBins[docKeys[inpSlot]].docHash,
+            docBins[docKeys[inpSlot]].lastUpdated
             );
     }
 

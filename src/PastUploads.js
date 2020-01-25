@@ -20,8 +20,8 @@ var account = "";
 var thisContract = "";
 var totalGasCost = "";
 var filePartsCount = "";
-const abi = [{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"docBins","outputs":[{"internalType":"string","name":"slot","type":"string"},{"internalType":"string","name":"docLabel","type":"string"},{"internalType":"bytes32","name":"docHash","type":"bytes32"},{"internalType":"string","name":"docBin","type":"string"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"string","name":"slot","type":"string"}],"name":"getDoc","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"string","name":"storageContainer","type":"string"},{"internalType":"string","name":"slot","type":"string"},{"internalType":"string","name":"docLabel","type":"string"}],"name":"storeBin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]
-const contractAddress = "0xdea87d2cc5c346e659f68ca6e102e1876cf88a79";
+const abi = [{"constant":true,"inputs":[{"internalType":"string","name":"a","type":"string"},{"internalType":"string","name":"b","type":"string"}],"name":"compareStrings","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"docBins","outputs":[{"internalType":"string","name":"docLabel","type":"string"},{"internalType":"string","name":"docHash","type":"string"},{"internalType":"uint256","name":"lastUpdated","type":"uint256"},{"internalType":"uint256","name":"docSlot","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"docKeys","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"inpSlot","type":"uint256"}],"name":"getDoc","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string[]","name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"inpSlot","type":"uint256"}],"name":"getDocMetaData","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"string","name":"dataStr","type":"string"},{"internalType":"string","name":"inpDocLabel","type":"string"},{"internalType":"string","name":"inpDocHash","type":"string"},{"internalType":"uint256","name":"argFlag","type":"uint256"}],"name":"storeBin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userSlots","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
+const contractAddress = "0x6309a92fd32003f36ee26705aac7e0e79fd203ce";
 var http = require('http');
 const Web3 = require('web3');
 const fs = require('fs');
@@ -31,6 +31,7 @@ const StyledTableCell = withStyles(theme => ({
     head: {
       backgroundColor: theme.palette.common.black,
       color: theme.palette.common.white,
+
     },
     body: {
       fontSize: 14,
@@ -45,15 +46,11 @@ const StyledTableCell = withStyles(theme => ({
     },
   }))(TableRow);
   
-  function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
+  function createData(filename, timestamp, filehash, download, deleteBtn) {
+    return { filename, timestamp, filehash, download, deleteBtn };
   }
-  
-  const rows = [
-    createData('File.txt', "2020-01-01 08:42:42", "0xfdw45werffd8fdsfsdfs", 
-    <Button  variant="contained" color="primary">Download</Button>, 
-    <Button  variant="contained" color="primary">Delete</Button>),
-  ];
+ 
+  var rows = [];
   
   const useStyles = {
     table: {
@@ -141,16 +138,42 @@ class PastUploads extends Component {
                     console.log("This contract: " + thisContract);
                     componentVar.setState({ contract: thisContract, processingFile: "false" });
               
-                    
                     console.log("Account before contract call: " + account)
-                    thisContract.methods.getDoc("0").call({from: account}).then(function(resp) {
-                      console.log(resp[0]); 
-                      console.log(resp[1]); 
-                      console.log(resp[2]); 
-                      console.log(resp[3]); 
-                      console.log(resp[4]); 
-                   })
+                    
+                    var fileName = "";
+                    var fileHashFull = "";
+                    var lastUpdated = 0;
+                    thisContract.methods.userSlots(account).call({from: account}).then(function(resp1) {
+
+                    console.log("get user slot count: " + resp1);
+
+                    for(var x = 0; x < resp1; x++){
+                    thisContract.methods.getDocMetaData(x.toString()).call({from: account}).then(function(resp) {
+                      
+                      fileName = resp[0]; 
+                      fileHashFull = resp[1]; 
+                      lastUpdated = resp[2]; 
+                      var lastUpdDatetime = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                      lastUpdDatetime.setUTCSeconds(lastUpdated);
+
+                      var fileHash = [fileHashFull.slice(0, 60), " ", fileHashFull.slice(60)].join('');
+
+                      rows.push(
+                        createData(fileName, lastUpdDatetime.toString(), fileHash, 
+                        <Button  variant="contained" color="primary">Download</Button>, 
+                        <Button  variant="contained" color="primary">Delete</Button>),
+                      );
+
+                      componentVar.setState({ tableRows: rows});
+                   }
+                   )
+
                   }
+
+
+                  })
+
+                }
                 });
     
     
@@ -190,7 +213,8 @@ class PastUploads extends Component {
               selectedAccount: account,
               estimatedGas: 0,
               processingFile: "false",
-              metamaskWarning: ""
+              metamaskWarning: "",
+              tableRows: rows
             }
           }
   //DocumentName TimeStamp FullDocHash DownloadDocument/Download_NA_HashStoredOnly RemoveFromBlockchain
@@ -198,7 +222,6 @@ class PastUploads extends Component {
          const {classes} = this.props;
         return (
         <div>
-    <p>Contract String: {this.state.contract.name}</p>
       <TableContainer className={classes.tableContainer} component={Paper}>
         <center><h3 className={classes.table}>Uploads for account: {this.state.selectedAccount}</h3></center>
     
@@ -208,22 +231,20 @@ class PastUploads extends Component {
           <TableHead>
             <TableRow>
               <StyledTableCell>Document Name</StyledTableCell>
-              <StyledTableCell align="right">Timestamp</StyledTableCell>
-              <StyledTableCell align="right">Document Hash</StyledTableCell>
-              <StyledTableCell align="right">Download Document</StyledTableCell>
-              <StyledTableCell align="right">Remove From Blockchain</StyledTableCell>
+              <StyledTableCell align="center">Timestamp</StyledTableCell>
+              <StyledTableCell align="center">Document Hash</StyledTableCell>
+              <StyledTableCell align="center">Download Document</StyledTableCell>
+              <StyledTableCell align="center">Remove From Blockchain</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
+            {this.state.tableRows.map(row => (
               <StyledTableRow key={row.name}>
-                <StyledTableCell component="th" scope="row">
-                  {row.name}
-                </StyledTableCell>
-                <StyledTableCell align="right">{row.calories}</StyledTableCell>
-                <StyledTableCell align="right">{row.fat}</StyledTableCell>
-                <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-                <StyledTableCell align="right">{row.protein}</StyledTableCell>
+                <StyledTableCell component="th" scope="row">{row.filename}</StyledTableCell>
+                <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
+                <StyledTableCell align="center"><code>{row.filehash}</code></StyledTableCell>
+                <StyledTableCell align="center">{row.download}</StyledTableCell>
+                <StyledTableCell align="center">{row.deleteBtn}</StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>
