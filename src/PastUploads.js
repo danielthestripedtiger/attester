@@ -74,7 +74,7 @@ const StyledTableCell = withStyles(theme => ({
 // }
  } ;
 
-class Uploads extends Component {
+class PastUploads extends Component {
  
     componentDidMount() {
         console.log("In CDM");
@@ -237,9 +237,9 @@ class Uploads extends Component {
             }
   }
 
-  Uploads.propTypes = {
+  PastUploads.propTypes = {
     classes: PropTypes.object.isRequired,
   };
 
-   export default withStyles(useStyles)(Uploads);
-//   export default Uploads;
+   export default withStyles(useStyles)(PastUploads);
+//   export default PastUploads;

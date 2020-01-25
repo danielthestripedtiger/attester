@@ -68,7 +68,7 @@ const contractAddress = "0xdea87d2cc5c346e659f68ca6e102e1876cf88a79";
 //   console.log('******** File created from base64 encoded string ********');
 // }
 
-class Home extends React.Component {
+class NewUpload extends React.Component {
 
   componentDidMount() {
     console.log("In CDM");
@@ -220,7 +220,7 @@ class Home extends React.Component {
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
             // console.log(base64str);
-            this.state.contract.methods.storeBin(base64str, x.toString(), "File1").estimateGas(
+            this.state.contract.methods.storeBin(base64str, x.toString(), acceptedFiles[0].name).estimateGas(
               {
                 from: account,
                 gasPrice: "2000000000",
@@ -280,7 +280,7 @@ class Home extends React.Component {
 
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
-            this.state.contract.methods.storeBin(base64str, x.toString(), "File1")
+            this.state.contract.methods.storeBin(base64str, x.toString(), this.state.selectedFile.name)
               .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(console.log);
 
             //   var contractObject;
@@ -441,7 +441,7 @@ class Home extends React.Component {
   }
 }
 
-Home.propTypes = {
+NewUpload.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
@@ -460,4 +460,4 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   null
-)(Home)
+)(NewUpload)

@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { Provider } from 'react-redux'
-import Home from './Home'
-import Uploads from './Uploads'
+import NewUpload from './NewUpload'
+import PastUploads from './PastUploads'
 import {
   BrowserRouter,
   Switch,
@@ -154,7 +154,7 @@ class App extends React.Component {
                         <Grid item xs={12} align='center' >
                             <ButtonGroup variant="contained" aria-label="contained primary button group">
                                 <Button component={Link} to={'/'}>Home</Button>
-                                <Button component={Link} to={'/uploads'}>Uploads</Button>
+                                <Button component={Link} to={'/pastuploads'}>Past Uploads</Button>
                             </ButtonGroup><br /><br /></Grid>
                     </Grid>
                 </AppBar>
@@ -166,9 +166,9 @@ class App extends React.Component {
     renders the first one that matches the current URL. */}
 <Switch>
 <Route exact path="/">
-  <Home/>
+  <NewUpload/>
   </Route>
-  <Route  path="/uploads" component={Uploads} />
+  <Route  path="/pastuploads" component={PastUploads} />
 
 </Switch>
 </div>
