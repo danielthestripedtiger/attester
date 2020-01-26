@@ -59,6 +59,7 @@ contract DocStore
             docBins[docKeys[userSlot]].lastUpdated = 0;
             docBins[docKeys[userSlot]].docNextSlot = 0;
             delete docBins[docKeys[userSlot]].dataParts;
+            docKeys[userSlot] = "";
     }
 
     function append( address a, string memory b) internal pure returns (bytes memory) {

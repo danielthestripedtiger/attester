@@ -258,7 +258,7 @@ const abi = [
 		"type": "function"
 	}
 ]
-const contractAddress = "0xD99a076C0efE709a702775A7d649Dc171B29bF09";
+const contractAddress = "0x4C258142474a9aA4728DE3f6eF8603c50a3b8764";
 var http = require('http');
 const Web3 = require('web3');
 const fs = require('fs');
