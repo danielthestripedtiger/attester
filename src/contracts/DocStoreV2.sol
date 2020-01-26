@@ -8,12 +8,12 @@ contract DocStore
         string docLabel;
         string docHash;
         uint lastUpdated;
-        uint docSlot;
+        uint docNextSlot;
     }
 
     mapping(bytes32 => DocData) public docBins;
     mapping(uint => bytes32) public docKeys;
-    mapping(address => uint) public userSlots;
+    mapping(address => uint) public userNextSlot;
 
     function storeBin(string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag) public {
         
@@ -26,16 +26,16 @@ contract DocStore
             // if the current location of the document key is empty...
             if( compareStrings(docBins[key].docHash, "") ){
                 // .. then set the key into the current user slot (slot is numberic and correclated with a key. To be used for web3 lookups)
-                docKeys[userSlots[msg.sender]] = keccak256(append(msg.sender,inpDocHash));
+                docKeys[userNextSlot[msg.sender]] = keccak256(append(msg.sender,inpDocHash));
                 // increment slot number for use with a new key in the future
-                userSlots[msg.sender] = userSlots[msg.sender] + 1;
+                userNextSlot[msg.sender] = userNextSlot[msg.sender] + 1;
             } else {
                 // if add flag was specified and there is already data, return it to empty default values
                 delete docBins[key].dataParts;
                 docBins[key].docLabel = "";
                 docBins[key].docHash = "";
                 docBins[key].lastUpdated = 0;
-                docBins[key].docSlot = 0;
+                docBins[key].docNextSlot = 0;
             }
         }
         
@@ -50,7 +50,15 @@ contract DocStore
         docBins[key].lastUpdated = now;
         
         // doc slot now taken (logically speaking, after array push), so increment the slot
-        docBins[key].docSlot++;
+        docBins[key].docNextSlot++;
+    }
+    
+    function deleteBin(uint userSlot) public {
+            docBins[docKeys[userSlot]].docLabel = "";
+            docBins[docKeys[userSlot]].docHash = "";
+            docBins[docKeys[userSlot]].lastUpdated = 0;
+            docBins[docKeys[userSlot]].docNextSlot = 0;
+            delete docBins[docKeys[userSlot]].dataParts;
     }
 
     function append( address a, string memory b) internal pure returns (bytes memory) {
@@ -61,20 +69,24 @@ contract DocStore
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))) );
     }
 
-    function getDoc(uint inpSlot) public view returns( string memory, string memory, uint, string[] memory ){
+    function getDoc(uint userSlot) public view returns( string memory, string memory, uint, uint, uint, string[] memory ){
         return ( 
-            docBins[docKeys[inpSlot]].docLabel,
-            docBins[docKeys[inpSlot]].docHash,
-            docBins[docKeys[inpSlot]].lastUpdated,
-            docBins[docKeys[inpSlot]].dataParts
+            docBins[docKeys[userSlot]].docLabel,
+            docBins[docKeys[userSlot]].docHash,
+            docBins[docKeys[userSlot]].lastUpdated,
+            docBins[docKeys[userSlot]].docNextSlot,
+            userSlot,
+            docBins[docKeys[userSlot]].dataParts
             );
     }
     
-    function getDocMetaData(uint inpSlot) public view returns( string memory, string memory, uint){
+    function getDocMetaData(uint userSlot) public view returns( string memory, string memory, uint, uint, uint){
         return ( 
-            docBins[docKeys[inpSlot]].docLabel,
-            docBins[docKeys[inpSlot]].docHash,
-            docBins[docKeys[inpSlot]].lastUpdated
+            docBins[docKeys[userSlot]].docLabel,
+            docBins[docKeys[userSlot]].docHash,
+            docBins[docKeys[userSlot]].lastUpdated,
+            docBins[docKeys[userSlot]].docNextSlot,
+            userSlot
             );
     }
 

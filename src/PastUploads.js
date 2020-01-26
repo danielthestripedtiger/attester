@@ -20,8 +20,245 @@ var account = "";
 var thisContract = "";
 var totalGasCost = "";
 var filePartsCount = "";
-const abi = [{"constant":true,"inputs":[{"internalType":"string","name":"a","type":"string"},{"internalType":"string","name":"b","type":"string"}],"name":"compareStrings","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"docBins","outputs":[{"internalType":"string","name":"docLabel","type":"string"},{"internalType":"string","name":"docHash","type":"string"},{"internalType":"uint256","name":"lastUpdated","type":"uint256"},{"internalType":"uint256","name":"docSlot","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"docKeys","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"inpSlot","type":"uint256"}],"name":"getDoc","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string[]","name":"","type":"string[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"inpSlot","type":"uint256"}],"name":"getDocMetaData","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"string","name":"dataStr","type":"string"},{"internalType":"string","name":"inpDocLabel","type":"string"},{"internalType":"string","name":"inpDocHash","type":"string"},{"internalType":"uint256","name":"argFlag","type":"uint256"}],"name":"storeBin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userSlots","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
-const contractAddress = "0x6309a92fd32003f36ee26705aac7e0e79fd203ce";
+const abi = [
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "userSlot",
+				"type": "uint256"
+			}
+		],
+		"name": "deleteBin",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "dataStr",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "inpDocLabel",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "inpDocHash",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "argFlag",
+				"type": "uint256"
+			}
+		],
+		"name": "storeBin",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "a",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "b",
+				"type": "string"
+			}
+		],
+		"name": "compareStrings",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"name": "docBins",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "docLabel",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "docHash",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lastUpdated",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "docNextSlot",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "docKeys",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "userSlot",
+				"type": "uint256"
+			}
+		],
+		"name": "getDoc",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "userSlot",
+				"type": "uint256"
+			}
+		],
+		"name": "getDocMetaData",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "userNextSlot",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+const contractAddress = "0xD99a076C0efE709a702775A7d649Dc171B29bF09";
 var http = require('http');
 const Web3 = require('web3');
 const fs = require('fs');
@@ -143,26 +380,35 @@ class PastUploads extends Component {
                     var fileName = "";
                     var fileHashFull = "";
                     var lastUpdated = 0;
-                    thisContract.methods.userSlots(account).call({from: account}).then(function(resp1) {
+                    var docNextSlot = 0;
+                    var userSlot = 0;
+                    thisContract.methods.userNextSlot(account).call({from: account}).then(function(resp1) {
 
                     console.log("get user slot count: " + resp1);
 
                     for(var x = 0; x < resp1; x++){
                     thisContract.methods.getDocMetaData(x.toString()).call({from: account}).then(function(resp) {
                       
-                      fileName = resp[0]; 
                       fileHashFull = resp[1]; 
-                      lastUpdated = resp[2]; 
-                      var lastUpdDatetime = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                      lastUpdDatetime.setUTCSeconds(lastUpdated);
 
-                      var fileHash = [fileHashFull.slice(0, 60), " ", fileHashFull.slice(60)].join('');
+                      if(fileHashFull !== ""){
+                        fileName = resp[0];
+                        lastUpdated = resp[2]; 
+                        docNextSlot = resp[3];
+                        userSlot = resp[4];
+                        console.log("User Slot: " + userSlot);
 
-                      rows.push(
-                        createData(fileName, lastUpdDatetime.toString(), fileHash, 
-                        <Button  variant="contained" color="primary">Download</Button>, 
-                        <Button  variant="contained" color="primary">Delete</Button>),
-                      );
+                        var lastUpdDatetime = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                        lastUpdDatetime.setUTCSeconds(lastUpdated);
+
+                        var fileHash = [fileHashFull.slice(0, 60), " ", fileHashFull.slice(60)].join(''); 
+
+                        rows.push(
+                          createData(fileName, lastUpdDatetime.toString(), fileHash, 
+                          <Button  onClick={componentVar.onClickHandler(userSlot, "DOWNLOAD")} variant="contained" color="primary">Download</Button>, 
+                          <Button  onClick={componentVar.onClickHandler(userSlot, "DELETE")} variant="contained" color="primary">Delete</Button>),
+                        );
+                      }
 
                       componentVar.setState({ tableRows: rows});
                    }
@@ -202,6 +448,45 @@ class PastUploads extends Component {
         }
       }
 
+      onClickHandler = (userSlot, buttonType) => {
+        return (event) => {
+
+
+          console.log("You clicked on row with userSlot " +  userSlot + ", and buttonType " + buttonType);
+
+          if(buttonType === "DELETE"){
+            console.log("DELETING ENTRY");
+            var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
+            .then(nonceVal => {
+    
+              console.log("noncePU: " + nonceVal);
+    
+            this.state.contract.methods.deleteBin(userSlot)
+            .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(console.log);
+            })
+          }
+
+          if(buttonType === "DOWNLOAD"){
+            console.log("DOWNLOADING ENTRY");
+            thisContract.methods.getDoc(userSlot).call({from: account}).then(function(resp) {
+
+              console.log("Download acct: " + account);
+              var fileName = resp[0];
+              var lastUpdated = resp[2]; 
+              var docNextSlot = resp[3];
+              var userSlot = resp[4];
+              var dataParts = resp[5];
+
+              console.log("Downloaded: " + resp[5][0]);
+              var sampleArr = base64ToArrayBuffer(resp[5][0]);
+              saveByteArray(fileName, sampleArr);
+
+
+            });
+          }
+        }
+      }
+
         constructor(props) {
             super(props);
             this.state = {
@@ -229,7 +514,7 @@ class PastUploads extends Component {
          className={classes.table} 
         aria-label="customized table">
           <TableHead>
-            <TableRow>
+            <TableRow key="99">
               <StyledTableCell>Document Name</StyledTableCell>
               <StyledTableCell align="center">Timestamp</StyledTableCell>
               <StyledTableCell align="center">Document Hash</StyledTableCell>
@@ -243,7 +528,7 @@ class PastUploads extends Component {
                 <StyledTableCell component="th" scope="row">{row.filename}</StyledTableCell>
                 <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
                 <StyledTableCell align="center"><code>{row.filehash}</code></StyledTableCell>
-                <StyledTableCell align="center">{row.download}</StyledTableCell>
+                <StyledTableCell align="center" id="99">{row.download}</StyledTableCell>
                 <StyledTableCell align="center">{row.deleteBtn}</StyledTableCell>
               </StyledTableRow>
             ))}
@@ -261,6 +546,26 @@ class PastUploads extends Component {
   PastUploads.propTypes = {
     classes: PropTypes.object.isRequired,
   };
+
+  function base64ToArrayBuffer(base64) {
+    var binaryString = window.atob(base64);
+    var binaryLen = binaryString.length;
+    var bytes = new Uint8Array(binaryLen);
+    for (var i = 0; i < binaryLen; i++) {
+       var ascii = binaryString.charCodeAt(i);
+       bytes[i] = ascii;
+    }
+    return bytes;
+ }
+
+ function saveByteArray(reportName, byte) {
+  var blob = new Blob([byte], {type: "application/text"});
+  var link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  var fileName = reportName;
+  link.download = fileName;
+  link.click();
+};
 
    export default withStyles(useStyles)(PastUploads);
 //   export default PastUploads;
