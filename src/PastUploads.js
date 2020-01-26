@@ -478,9 +478,19 @@ class PastUploads extends Component {
               var dataParts = resp[5];
 
               console.log("Downloaded: " + resp[5][0]);
-              var sampleArr = base64ToArrayBuffer(resp[5][0]);
-              saveByteArray(fileName, sampleArr);
 
+              var mergedArray = null;
+              var completeFile = base64ToArrayBuffer(resp[5][0]);
+              for(var x = 1; x < docNextSlot; x++){
+                var currentPart = base64ToArrayBuffer(resp[5][x]);
+
+                mergedArray = new Uint8Array(completeFile.length + currentPart.length);
+                mergedArray.set(completeFile);
+                mergedArray.set(currentPart, completeFile.length);
+                completeFile = mergedArray;
+              }
+
+              saveByteArray(fileName, completeFile);
 
             });
           }
