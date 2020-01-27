@@ -52,6 +52,7 @@ npm install react-router-dom
 npm install redux-devtools-extension
 npm install redux-logger
 npm install js-sha3
+npm install html-react-parser
 
 =====
 IF INSTALLS FAIL, TRY (in PowerShell):

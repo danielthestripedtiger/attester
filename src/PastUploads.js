@@ -310,10 +310,17 @@ const StyledTableCell = withStyles(theme => ({
 
 class PastUploads extends Component {
  
+
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
     componentDidMount() {
         console.log("In CDM");
-    
-    
+        this.interval = setInterval(() => this.setState({ time: Date.now() }), 1000);
+ 
+
+
         // const script = document.createElement("script");
         // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
         // script.async = true;
@@ -511,6 +518,12 @@ class PastUploads extends Component {
               metamaskWarning: "",
               tableRows: rows
             }
+
+            this.loadData = this.loadData.bind(this)
+          }
+
+          loadData() {
+
           }
   //DocumentName TimeStamp FullDocHash DownloadDocument/Download_NA_HashStoredOnly RemoveFromBlockchain
     render() {

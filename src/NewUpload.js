@@ -11,6 +11,8 @@ import axios from 'axios';
 import Dropzone from 'react-dropzone'
 import Footer from './Footer'
 import { connect } from 'react-redux'
+import Parser from 'html-react-parser';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const sha3_512 = require('js-sha3').sha3_512;
 var http = require('http');
@@ -412,18 +414,15 @@ class NewUpload extends React.Component {
       selectedAccount: account,
       estimatedGas: 0,
       processingFile: "false",
-      metamaskWarning: ""
+      metamaskWarning: "",
+      savedBtnDisabled: true,
+      returnMessages: []
     }
   }
 
   onDrop = (acceptedFiles) => {
 
-    console.log(acceptedFiles[0])
-    this.setState({
-      selectedFileName: acceptedFiles[0].name,
-      selectedFile: acceptedFiles[0],
-      processingFile: "true"
-    })
+    console.log(acceptedFiles[0]);
 
     const fileAsBlob = new Blob([acceptedFiles[0]]);
 
@@ -484,14 +483,24 @@ class NewUpload extends React.Component {
           })
         }
         );
-
-
     }
     )
+
+    this.setState({
+      selectedFileName: acceptedFiles[0].name,
+      selectedFile: acceptedFiles[0],
+      processingFile: "true",
+      savedBtnDisabled: false,
+      returnMessages: [],
+      loadingProgress: false
+    })
   }
 
   onClickHandler = event => {
 
+    this.setState({
+      loadingProgress: true
+    })
     console.log(this.state.selectedFile.name);
     console.log(this.state.contract.options.address);
 
@@ -515,7 +524,9 @@ class NewUpload extends React.Component {
         .then(nonceVal => {
 
           console.log("nonce2: " + nonceVal);
+          var componentVar = this;
 
+          var filepartCount = 0;
           for (var x = 0; x < fileChunks; x++) {
 
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
@@ -527,7 +538,20 @@ class NewUpload extends React.Component {
             // console.log(base64str);
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
             this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer),addFlag)
-              .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(console.log);
+              .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(function(res) {
+                filepartCount++;
+                var retMsgs = componentVar.state.returnMessages;
+                retMsgs.push("<div>File part " + filepartCount + " Transaction hash: <a href = 'https://rinkeby.etherscan.io/tx/" + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div><br/>");
+                componentVar.setState({
+                  returnMessages: retMsgs
+                })
+
+                if(filepartCount===x){
+                  componentVar.setState({
+                    loadingProgress: false
+                  })
+                }
+              });
 
             //   var contractObject;
             //   batch.add(this.state.contract.methods.storeBin(base64str,"1","File1").send
@@ -657,7 +681,7 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             <label htmlFor="outlined-button-file">
-              <Button variant="outlined" component="span" onClick={this.onClickHandler}
+              <Button variant="outlined" component="span" disabled={this.state.savedBtnDisabled} onClick={this.onClickHandler}
                 // className={classes.button}
                 startIcon={<CloudUploadIcon />}>
                 Save to Ethereum
@@ -667,16 +691,27 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
-            Processing File: {this.state.processingFile}
+          {this.state.loadingProgress ? (
+        <div><br/>Saving document to blockchain. Please wait (may take up to 15 mins).<br/><br/><CircularProgress/></div>
+      ) : (
+       ""
+      )}
+          
+            {this.state.returnMessages.map((msg, index) => (
+          <div key={index}>
+            {Parser(msg)}
+          </div>
+        ))}
           </Grid>
           <Grid item xs={2}></Grid>
+          
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             <br />
             <br />
             <br />
             <b>Next: </b>
-            <a href="/uploads">Manage Previously Uploaded Documents</a>
+            <a href="/pastuploads">Manage Previously Uploaded Documents</a>
           </Grid>
           <Grid item xs={2}></Grid>
         </Grid>
