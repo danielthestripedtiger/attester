@@ -541,7 +541,7 @@ class NewUpload extends React.Component {
               .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(function(res) {
                 filepartCount++;
                 var retMsgs = componentVar.state.returnMessages;
-                retMsgs.push("<div><br/>File part " + filepartCount + " Transaction hash: <a href = 'https://rinkeby.etherscan.io/tx/" + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
+                retMsgs.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = 'https://rinkeby.etherscan.io/tx/" + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
                 componentVar.setState({
                   returnMessages: retMsgs
                 })
