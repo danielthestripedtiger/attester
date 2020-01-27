@@ -372,7 +372,8 @@ class PastUploads extends Component {
                   currentAccount = result[0];
     
                   // console.log("Current Account: " + currentAccount);
-                  if (currentAccount !== account) {
+                  rows = [];
+                  // if (currentAccount !== account) {
                     account = currentAccount;
                     componentVar.setState({ selectedAccount: account });
                     console.log("Account: " + account);
@@ -426,11 +427,11 @@ class PastUploads extends Component {
 
                   })
 
-                }
+                // }
                 });
     
     
-              }, 100);
+              }, 10000);
 
               
             } catch (error) {
