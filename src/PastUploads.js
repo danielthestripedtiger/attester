@@ -13,6 +13,7 @@ import Footer from './Footer';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import Alert from '@material-ui/lab/Alert';
+import Parser from 'html-react-parser';
 
 var provider = "";
 var myWeb3 = "";
@@ -365,14 +366,14 @@ class PastUploads extends Component {
               window.ethereum.enable();
     
               var componentVar = this;
-              var accountInterval = setInterval(() => {
+              var accountInterval = setInterval(function getPastUploads(){
                 // console.log("In internal");
                 var currentAccount = "";
                 myWeb3.eth.getAccounts().then(function (result) {
                   currentAccount = result[0];
     
                   // console.log("Current Account: " + currentAccount);
-                  rows = [];
+                  
                   // if (currentAccount !== account) {
                     account = currentAccount;
                     componentVar.setState({ selectedAccount: account });
@@ -394,6 +395,8 @@ class PastUploads extends Component {
 
                     console.log("get user slot count: " + resp1);
 
+                    rows = [];
+
                     for(var x = 0; x < resp1; x++){
                     thisContract.methods.getDocMetaData(x.toString()).call({from: account}).then(function(resp) {
                       
@@ -412,7 +415,7 @@ class PastUploads extends Component {
                         var fileHash = [fileHashFull.slice(0, 60), " ", fileHashFull.slice(60)].join(''); 
 
                         rows.push(
-                          createData(fileName, lastUpdDatetime.toString(), fileHash, 
+                          createData(fileName + "<br/> (in slot #" + userSlot + ")", lastUpdDatetime.toString(), fileHash, 
                           <Button  onClick={componentVar.onClickHandler(userSlot, "DOWNLOAD")} variant="contained" color="primary">Download</Button>, 
                           <Button  onClick={componentVar.onClickHandler(userSlot, "DELETE")} variant="contained" color="primary">Delete</Button>),
                         );
@@ -429,11 +432,9 @@ class PastUploads extends Component {
 
                 // }
                 });
-    
-    
-              }, 10000);
+              return getPastUploads;
+              }(), 30000);
 
-              
             } catch (error) {
               // User denied account access...
             }
@@ -549,10 +550,10 @@ class PastUploads extends Component {
           <TableBody>
             {this.state.tableRows.map(row => (
               <StyledTableRow key={row.name}>
-                <StyledTableCell component="th" scope="row">{row.filename}</StyledTableCell>
+                <StyledTableCell component="th" scope="row">{Parser(row.filename)}</StyledTableCell>
                 <StyledTableCell align="center">{row.timestamp}</StyledTableCell>
                 <StyledTableCell align="center"><code>{row.filehash}</code></StyledTableCell>
-                <StyledTableCell align="center" id="99">{row.download}</StyledTableCell>
+                <StyledTableCell align="center">{row.download}</StyledTableCell>
                 <StyledTableCell align="center">{row.deleteBtn}</StyledTableCell>
               </StyledTableRow>
             ))}

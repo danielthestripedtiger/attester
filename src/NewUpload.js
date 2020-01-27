@@ -541,7 +541,7 @@ class NewUpload extends React.Component {
               .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(function(res) {
                 filepartCount++;
                 var retMsgs = componentVar.state.returnMessages;
-                retMsgs.push("<div>File part " + filepartCount + " Transaction hash: <a href = 'https://rinkeby.etherscan.io/tx/" + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div><br/>");
+                retMsgs.push("<div><br/>File part " + filepartCount + " Transaction hash: <a href = 'https://rinkeby.etherscan.io/tx/" + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
                 componentVar.setState({
                   returnMessages: retMsgs
                 })
@@ -598,7 +598,7 @@ class NewUpload extends React.Component {
 
   render() {
     // const { classes } = this.props;
-    const { classes } = this.props;
+    // const { classes } = this.props;
     // const classes = useStyles();
     return (
 
@@ -621,7 +621,8 @@ class NewUpload extends React.Component {
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} align='center' >
+            <br/><br/><b>Step 1: Select File</b><br/><br/>
             <Box border={1}>
               <center>
                 <Dropzone
@@ -681,6 +682,7 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             <label htmlFor="outlined-button-file">
+              <br/><br/><b>Step 2: Save to Ethereum Blockchain</b><br/><br/>
               <Button variant="outlined" component="span" disabled={this.state.savedBtnDisabled} onClick={this.onClickHandler}
                 // className={classes.button}
                 startIcon={<CloudUploadIcon />}>
@@ -692,7 +694,7 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
           {this.state.loadingProgress ? (
-        <div><br/>Saving document to blockchain. Please wait (may take up to 15 mins).<br/><br/><CircularProgress/></div>
+        <div><br/>Saving document to blockchain. Please wait (may take up to 15 mins).<br/><br/><br/><CircularProgress/></div>
       ) : (
        ""
       )}
@@ -722,9 +724,9 @@ class NewUpload extends React.Component {
   }
 }
 
-NewUpload.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
+// NewUpload.propTypes = {
+//   classes: PropTypes.object.isRequired,
+// };
 
 const mapStateToProps = state => {
   return {
