@@ -112,6 +112,11 @@ class NewUpload extends React.Component {
 
     } else {
       getMetamaskWarning(this);
+      this.setState(
+        {
+          dropzoneDisabledFlg: true
+        }
+      )
     }
   }
 
@@ -125,7 +130,8 @@ class NewUpload extends React.Component {
       processingFile: "false",
       metamaskWarning: "",
       savedBtnDisabled: true,
-      returnMessages: []
+      returnMessages: [],
+      dropzoneDisabledFlg: false
     }
   }
 
@@ -189,7 +195,7 @@ class NewUpload extends React.Component {
             ).catch((err) => {
               console.log("ERROR!!!");
               var msgs = [];
-              msgs.push("<br/><p style='color:red'>An error has occurred... " + err.message.substring(0,1000)+"</p>");
+              msgs.push("<br/><p style='color:red'>An error has occurred... " + err.message.substring(0, 1000) + "</p>");
 
               this.setState({
                 selectedFileName: acceptedFiles[0].name,
@@ -256,7 +262,7 @@ class NewUpload extends React.Component {
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
             this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer), addFlag)
               .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then(function (res) {
-                
+
                 filepartCount++;
                 thisComponent.state.returnMessages.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
                 thisComponent.setState({
@@ -270,7 +276,7 @@ class NewUpload extends React.Component {
                 }
               }).catch((err) => {
                 filepartCount++;
-                thisComponent.state.returnMessages.push("<br/><div><p style='color:red'>File part " + filepartCount + ": An error has occurred... "+err.message.substring(0,1000) + "</p></div>");
+                thisComponent.state.returnMessages.push("<br/><div><p style='color:red'>File part " + filepartCount + ": An error has occurred... " + err.message.substring(0, 1000) + "</p></div>");
                 thisComponent.setState({
                   returnMessages: thisComponent.state.returnMessages
                 })
@@ -336,6 +342,7 @@ class NewUpload extends React.Component {
                   onDrop={this.onDrop}
                   minSize={0}
                   maxSize={50000000000}
+                  disabled={this.state.dropzoneDisabledFlg}
                 >
                   {({ getRootProps, getInputProps, isDragActive, isDragReject, rejectedFiles }) => {
                     const isFileTooLarge = rejectedFiles.length > 0 && rejectedFiles[0].size > 50000000000;

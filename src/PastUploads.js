@@ -93,7 +93,7 @@ class PastUploads extends Component {
         setupEthPoll(this, true, window.ethereum.networkVersion);
       }, 1000);
 
-      
+
       var accountInterval = setInterval(() => {
         setupEthPoll(this, true, window.ethereum.networkVersion);
       }, 20000);
@@ -123,10 +123,10 @@ class PastUploads extends Component {
             var thisComponent = this;
             this.state.contract.methods.deleteBin(userSlot)
               .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then((res) => {
-                
+
                 var msgs = [];
                 msgs.push("<div><br/>Deletion successful. Transaction hash (if you still see it in the list, wait at most 20 secs for the table to refresh): <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
- 
+
                 thisComponent.setState({
                   returnMessages: msgs,
                   loadingProgress: false
@@ -136,19 +136,19 @@ class PastUploads extends Component {
               .catch((err) => {
 
                 var msgs = [];
-                msgs.push("<br/><div><p style='color:red'>An error has occurred... "+err.message.substring(0,1000) + "</p></div>");
+                msgs.push("<br/><div><p style='color:red'>An error has occurred... " + err.message.substring(0, 1000) + "</p></div>");
                 thisComponent.setState({
                   returnMessages: msgs,
                   loadingProgress: false
                 })
-                
+
               });
           })
       }
 
       if (buttonType === "DOWNLOAD") {
         console.log("DOWNLOADING ENTRY");
-        
+
         var thisComponent = this;
         this.state.contract.methods.getDoc(userSlot).call({ from: this.state.selectedAccount }).then(function (resp) {
 
@@ -196,6 +196,13 @@ class PastUploads extends Component {
     const { classes } = this.props;
     return (
       <div>
+        <Grid container spacing={3}>
+          <Grid item xs={3}></Grid>
+          <Grid item xs={6} align='center' >
+            {this.state.metamaskWarning}
+          </Grid>
+          <Grid item xs={3}></Grid>
+        </Grid>
         <TableContainer className={classes.tableContainer} component={Paper}>
           <center><h3 className={classes.table}>Uploads for account: {this.state.selectedAccount}</h3></center>
 
@@ -225,7 +232,7 @@ class PastUploads extends Component {
           </Table>
         </TableContainer>
         <Grid container spacing={3}>
-        <Grid item xs={2}></Grid>
+          <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             {this.state.loadingProgress ? (
               <div><br />Deleting from Ethereum. Please wait (may take up to 15 mins).<br /><br /><br /><CircularProgress /></div>
