@@ -176,37 +176,48 @@ class NewUpload extends React.Component {
               function (gasCost) {
                 console.log(gasCost);
                 totalGasCost += gasCost;
-                thisComponent.setState({ estimatedGas: totalGasCost });
+
+                thisComponent.setState({
+                  estimatedGas: totalGasCost,
+                  selectedFileName: acceptedFiles[0].name,
+                  selectedFile: acceptedFiles[0],
+                  savedBtnDisabled: false,
+                  returnMessages: [],
+                  loadingProgress: false
+                })
               }
-            )
+            ).catch((err) => {
+              console.log("ERROR!!!");
+              var msgs = [];
+              msgs.push("<br/><p style='color:red'>An error has occurred... " + err.message.substring(0,1000)+"</p>");
+
+              this.setState({
+                selectedFileName: acceptedFiles[0].name,
+                selectedFile: acceptedFiles[0],
+                savedBtnDisabled: true,
+                returnMessages: msgs,
+                loadingProgress: false
+              })
+            });
 
             sliceStart += 3072;
             sliceEnd += 3072;
             nonceVal++;
           }
-          thisComponent.setState({
-            processingFile: "false"
-          })
+
         }
         );
     }
     )
-
-    this.setState({
-      selectedFileName: acceptedFiles[0].name,
-      selectedFile: acceptedFiles[0],
-      processingFile: "true",
-      savedBtnDisabled: false,
-      returnMessages: [],
-      loadingProgress: false
-    })
   }
 
   onClickHandler = event => {
 
     this.setState({
-      loadingProgress: true
+      loadingProgress: true,
+      returnMessages: []
     })
+
     console.log(this.state.selectedFile.name);
     console.log(this.state.contract.options.address);
 
@@ -245,11 +256,23 @@ class NewUpload extends React.Component {
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
             this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer), addFlag)
               .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then(function (res) {
+                
                 filepartCount++;
-                var retMsgs = thisComponent.state.returnMessages;
-                retMsgs.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
+                thisComponent.state.returnMessages.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
                 thisComponent.setState({
-                  returnMessages: retMsgs
+                  returnMessages: thisComponent.state.returnMessages
+                })
+
+                if (filepartCount === x) {
+                  thisComponent.setState({
+                    loadingProgress: false
+                  })
+                }
+              }).catch((err) => {
+                filepartCount++;
+                thisComponent.state.returnMessages.push("<br/><div><p style='color:red'>File part " + filepartCount + ": An error has occurred... "+err.message.substring(0,1000) + "</p></div>");
+                thisComponent.setState({
+                  returnMessages: thisComponent.state.returnMessages
                 })
 
                 if (filepartCount === x) {

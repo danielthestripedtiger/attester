@@ -11,6 +11,8 @@ import Footer from './Footer';
 import PropTypes from 'prop-types';
 import Parser from 'html-react-parser';
 import { setupEthPoll, getMetamaskWarning } from './Helper';
+import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 var myWeb3 = "";
 const Web3 = require('web3');
@@ -108,13 +110,39 @@ class PastUploads extends Component {
 
       if (buttonType === "DELETE") {
         console.log("DELETING ENTRY");
+
+        this.setState({
+          loadingProgress: true
+        })
+
         var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
           .then(nonceVal => {
 
             console.log("noncePU: " + nonceVal);
 
+            var thisComponent = this;
             this.state.contract.methods.deleteBin(userSlot)
-              .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then(console.log);
+              .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then((res) => {
+                
+                var msgs = [];
+                msgs.push("<div><br/>Deletion successful. Transaction hash (if you still see it in the list, wait at most 20 secs for the table to refresh): <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
+ 
+                thisComponent.setState({
+                  returnMessages: msgs,
+                  loadingProgress: false
+                })
+
+              })
+              .catch((err) => {
+
+                var msgs = [];
+                msgs.push("<br/><div><p style='color:red'>An error has occurred... "+err.message.substring(0,1000) + "</p></div>");
+                thisComponent.setState({
+                  returnMessages: msgs,
+                  loadingProgress: false
+                })
+                
+              });
           })
       }
 
@@ -157,7 +185,9 @@ class PastUploads extends Component {
       estimatedGas: 0,
       processingFile: "false",
       metamaskWarning: "",
-      tableRows: []
+      tableRows: [],
+      returnMessages: [],
+      loadingProgress: false
     }
   }
 
@@ -194,6 +224,22 @@ class PastUploads extends Component {
             </TableBody>
           </Table>
         </TableContainer>
+        <Grid container spacing={3}>
+        <Grid item xs={2}></Grid>
+          <Grid item xs={8} align='center' >
+            {this.state.loadingProgress ? (
+              <div><br />Deleting from Ethereum. Please wait (may take up to 15 mins).<br /><br /><br /><CircularProgress /></div>
+            ) : (
+                ""
+              )}
+            {this.state.returnMessages.map((msg, index) => (
+              <div key={index}>
+                {Parser(msg)}
+              </div>
+            ))}
+          </Grid>
+          <Grid item xs={2}></Grid>
+        </Grid>
         <Footer />
       </div>
 
