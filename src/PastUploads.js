@@ -125,7 +125,7 @@ class PastUploads extends Component {
               .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then((res) => {
 
                 var msgs = [];
-                msgs.push("<div><br/>Deletion successful. Transaction hash (if you still see it in the list, wait at most 20 secs for the table to refresh): <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
+                msgs.push("<div><br/>Deletion of file successful. If you still see it in the list, wait at most 20 secs for the table to refresh. Transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
 
                 thisComponent.setState({
                   returnMessages: msgs,
