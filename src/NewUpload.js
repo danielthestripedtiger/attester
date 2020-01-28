@@ -1,24 +1,20 @@
 import React from 'react';
 import './App.css';
 import Box from '@material-ui/core/Box';
-import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import { withStyles } from '@material-ui/styles';
 import Grid from '@material-ui/core/Grid';
-import PropTypes from 'prop-types';
 import axios from 'axios';
 import Dropzone from 'react-dropzone'
 import Footer from './Footer'
 import { connect } from 'react-redux'
 import Parser from 'html-react-parser';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import * as Constants from './Constants';
+import { setupEthPoll, getMetamaskWarning } from './Helper';
 
 const sha3_512 = require('js-sha3').sha3_512;
-var http = require('http');
 const Web3 = require('web3');
-const fs = require('fs');
-var CryptoJS = require("crypto-js");
 
 const styles = theme => ({
   root: {
@@ -40,254 +36,13 @@ const styles = theme => ({
 //  const myWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
 //  var myWeb3 = new Web3(new Web3.providers.HttpProvider('https://rinkeby.infura.io/v3/7312507568eb4da4871d2dce315f20bd'));
 
-// var encrypted = CryptoJS.AES.encrypt("BECA954988086B0DBDB3DDDC39CFEF5EF38269795AB74286323CF64A572F171C", "SecretPassphrase");
+// var encrypted = CryptoJS.AES.encrypt("[PK HERE]", "SecretPassphrase");
 //  window.localStorage.setItem("pkey",encrypted);
 
-var provider = "";
 var myWeb3 = "";
-var account = "";
 var thisContract = "";
 var totalGasCost = "";
-var filePartsCount = "";
-const abi = [
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "userSlot",
-				"type": "uint256"
-			}
-		],
-		"name": "deleteBin",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "dataStr",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "inpDocLabel",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "inpDocHash",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "argFlag",
-				"type": "uint256"
-			}
-		],
-		"name": "storeBin",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "a",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "b",
-				"type": "string"
-			}
-		],
-		"name": "compareStrings",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"name": "docBins",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "docLabel",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "docHash",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "lastUpdated",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "docNextSlot",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "docKeys",
-		"outputs": [
-			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "userSlot",
-				"type": "uint256"
-			}
-		],
-		"name": "getDoc",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string[]",
-				"name": "",
-				"type": "string[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "userSlot",
-				"type": "uint256"
-			}
-		],
-		"name": "getDocMetaData",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "userNextSlot",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
-const contractAddress = "0x4C258142474a9aA4728DE3f6eF8603c50a3b8764";
+
 //     // function to encode file data to base64 encoded string
 // function base64_encode(file) {
 //   // read binary data
@@ -309,97 +64,54 @@ class NewUpload extends React.Component {
 
   componentDidMount() {
     console.log("In CDM");
-    console.log("Web 3: " + this.props.web3)
+
     // const script = document.createElement("script");
     // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
     // script.async = true;
 
     // document.body.appendChild(script);
-
-    axios.get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
-      .then(res => {
-        console.log(res.data[0].price_usd);
-        this.setState({ etherPrice: res.data[0].price_usd });
-      });
-
     // if (window.ethereum) {
     //   myWeb3 = new Web3(Web3.givenProvider);
 
-      // var subscription = myWeb3.eth.subscribe('logs', {
-      //   address: '0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763', fromBlock: 2,
-      //   topics: ['0x296ba4ca62c6c21c95e828080cb8aec7481b71390585605300a8a76f9e95b527']
-      // }, function (error, result) {
-      //   if (!error)
-      //     console.log("Res: " + myWeb3.utils.toBN(result.data));
-      // })
-      //   .on("data", function (log) {
-      //     console.log(log.data);
-      //   })
-      //   .on("changed", function (log) {
-      //   });
+    // var subscription = myWeb3.eth.subscribe('logs', {
+    //   address: '0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763', fromBlock: 2,
+    //   topics: ['0x296ba4ca62c6c21c95e828080cb8aec7481b71390585605300a8a76f9e95b527']
+    // }, function (error, result) {
+    //   if (!error)
+    //     console.log("Res: " + myWeb3.utils.toBN(result.data));
+    // })
+    //   .on("data", function (log) {
+    //     console.log(log.data);
+    //   })
+    //   .on("changed", function (log) {
+    //   });
 
-      // // unsubscribes the subscription
-      // subscription.unsubscribe(function (error, success) {
-      //   if (success)
-      //     console.log('Successfully unsubscribed!');
-      // });
+    // // unsubscribes the subscription
+    // subscription.unsubscribe(function (error, success) {
+    //   if (success)
+    //     console.log('Successfully unsubscribed!');
+    // });
 
-      // Modern dapp browsers...
-      if (window.ethereum) {
-        myWeb3 = new Web3(Web3.givenProvider);
-        this.setState({ web3: myWeb3 });
-        try {
-          // Request account access if needed
-          window.ethereum.enable();
+    // Modern dapp browsers...
+    if (window.ethereum) {
+      myWeb3 = new Web3(Web3.givenProvider);
+      this.setState({ web3: myWeb3 });
 
-          var componentVar = this;
-          var accountInterval = setInterval(() => {
-            // console.log("In internal");
-            var currentAccount = "";
-            myWeb3.eth.getAccounts().then(function (result) {
-              currentAccount = result[0];
+      // Request account access if needed
+      window.ethereum.enable();
 
-              // console.log("Current Account: " + currentAccount);
-              if (currentAccount !== account) {
-                account = currentAccount;
-                componentVar.setState({ selectedAccount: account });
-                console.log("Account: " + account);
-              }
-            });
+      axios.get(Constants.ETH_PRICE_API_URL)
+        .then(res => {
+          console.log(res.data[0].price_usd);
+          this.setState({ etherPrice: res.data[0].price_usd });
+        });
 
-
-          }, 100);
-        } catch (error) {
-          // User denied account access...
-        }
-        this.setState({ selectedAccount: account });
-      // }
-
-      // // // Legacy dapp browsers...
-      // // else if (window.web3) {
-      // //   window.web3 = new Web3(window.web3.currentProvider);
-      // //   // Acccounts always exposed
-
-      // // }
-      // // Non-dapp browsers...
-      // else {
-      //   console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      // }
-      // });
-
-      console.log('Creating contract instance');
-      thisContract = new myWeb3.eth.Contract(abi, contractAddress);
-      console.log("This contract: " + thisContract);
-      this.setState({ contract: thisContract, processingFile: "false" });
+      var accountInterval = setInterval(() => {
+        setupEthPoll(this, false, window.ethereum.networkVersion);
+      }, 1000);
 
     } else {
-      var mmMissingMsg = <Alert severity="error"><center><div>This website Uses MetaMask and you dont seem to have it installed. Please install MetaMask and fill your account with sufficient Ether: <a href="https://metamask.io/">https://metamask.io</a></div></center></Alert>;
-
-      this.setState(
-        {
-          metamaskWarning: mmMissingMsg
-        }
-      );
+      getMetamaskWarning(this);
     }
   }
 
@@ -409,9 +121,6 @@ class NewUpload extends React.Component {
       selectedFile: null,
       selectedFileName: "",
       contract: thisContract,
-      // web3: null,
-      // pk_input: null,
-      selectedAccount: account,
       estimatedGas: 0,
       processingFile: "false",
       metamaskWarning: "",
@@ -423,24 +132,21 @@ class NewUpload extends React.Component {
   onDrop = (acceptedFiles) => {
 
     console.log(acceptedFiles[0]);
-
     const fileAsBlob = new Blob([acceptedFiles[0]]);
-
     console.log(fileAsBlob);
-
     totalGasCost = 0;
 
     fileAsBlob.arrayBuffer().then(buffer => {
       var fileBuffer = Buffer.from(buffer);
       var fileLength = fileBuffer.length;
       console.log("File Length1: " + fileLength);
-      var fileChunks = Math.ceil(fileLength / 1024);
-      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / 1024));
+      var fileChunks = Math.ceil(fileLength / 3072);
+      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / 3072));
 
       var batch = new this.state.web3.BatchRequest();
 
       var sliceStart = 0;
-      var sliceEnd = 1024;
+      var sliceEnd = 3072;
 
       var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
         .then(nonceVal => {
@@ -448,37 +154,37 @@ class NewUpload extends React.Component {
           console.log("nonce1: " + nonceVal);
 
           this.setState({ noOfFileParts: fileChunks });
-          var componentVar = this;
+          var thisComponent = this;
           for (var x = 0; x < fileChunks; x++) {
 
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
             var addFlag = "0";
-            if(x == 0){
+            if (x == 0) {
               addFlag = "1";
             }
             // console.log(base64str);
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
-            this.state.contract.methods.storeBin(base64str, acceptedFiles[0].name, sha3_512(fileBuffer),addFlag).estimateGas(
+            this.state.contract.methods.storeBin(base64str, acceptedFiles[0].name, sha3_512(fileBuffer), addFlag).estimateGas(
               {
-                from: account,
+                from: this.state.selectedAccount,
                 gasPrice: "2000000000",
-                gasLimit: "2000000"
+                gasLimit: "5000000"
               }, function (error, estimatedGas) {
               }
             ).then(
               function (gasCost) {
                 console.log(gasCost);
                 totalGasCost += gasCost;
-                componentVar.setState({ estimatedGas: totalGasCost });
+                thisComponent.setState({ estimatedGas: totalGasCost });
               }
             )
 
-            sliceStart += 1024;
-            sliceEnd += 1024;
+            sliceStart += 3072;
+            sliceEnd += 3072;
             nonceVal++;
           }
-          componentVar.setState({
+          thisComponent.setState({
             processingFile: "false"
           })
         }
@@ -512,19 +218,19 @@ class NewUpload extends React.Component {
       var fileBuffer = Buffer.from(buffer);
       var fileLength = fileBuffer.length;
       console.log("File Length: " + fileLength);
-      var fileChunks = Math.ceil(fileLength / 1024);
-      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / 1024));
+      var fileChunks = Math.ceil(fileLength / 3072);
+      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / 3072));
 
       var batch = new this.state.web3.BatchRequest();
 
       var sliceStart = 0;
-      var sliceEnd = 1024;
+      var sliceEnd = 3072;
 
       var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
         .then(nonceVal => {
 
           console.log("nonce2: " + nonceVal);
-          var componentVar = this;
+          var thisComponent = this;
 
           var filepartCount = 0;
           for (var x = 0; x < fileChunks; x++) {
@@ -532,22 +238,22 @@ class NewUpload extends React.Component {
             var base64str = fileBuffer.slice(sliceStart, sliceEnd).toString('base64');
 
             var addFlag = "0";
-            if(x === 0){
+            if (x === 0) {
               addFlag = "1";
             }
             // console.log(base64str);
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
-            this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer),addFlag)
-              .send({ nonce: nonceVal, from: account, gasPrice: "2000000000", gasLimit: "2000000" }).then(function(res) {
+            this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer), addFlag)
+              .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then(function (res) {
                 filepartCount++;
-                var retMsgs = componentVar.state.returnMessages;
-                retMsgs.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = 'https://rinkeby.etherscan.io/tx/" + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
-                componentVar.setState({
+                var retMsgs = thisComponent.state.returnMessages;
+                retMsgs.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
+                thisComponent.setState({
                   returnMessages: retMsgs
                 })
 
-                if(filepartCount===x){
-                  componentVar.setState({
+                if (filepartCount === x) {
+                  thisComponent.setState({
                     loadingProgress: false
                   })
                 }
@@ -566,40 +272,18 @@ class NewUpload extends React.Component {
             // .on('receipt', receipt => {
             //   console.log(receipt);})
 
-            sliceStart += 1024;
-            sliceEnd += 1024;
+            sliceStart += 3072;
+            sliceEnd += 3072;
             nonceVal++;
           }
           // batch.execute();
         }
         );
-      }
+    }
     )
   }
 
-  // onPKClickHandler=event=>{
-
-  //   var encrypted = CryptoJS.AES.encrypt(this.state.pk_input, "SecretPassphrase");
-  //   window.localStorage.setItem("pkey",encrypted);
-  //   this.setState({
-  //     selectedAccount: myWeb3.eth.accounts.privateKeyToAccount('0x' + CryptoJS.AES.decrypt(window.localStorage.getItem("pkey"), "SecretPassphrase").toString(CryptoJS.enc.Utf8))
-
-  //   })
-  // }
-
-  // onPKChangeHandler=event=>{
-
-  //   this.setState({
-  //     pk_input: event.target.value
-  //   })
-
-
-  // }
-
   render() {
-    // const { classes } = this.props;
-    // const { classes } = this.props;
-    // const classes = useStyles();
     return (
 
       <div >
@@ -616,13 +300,13 @@ class NewUpload extends React.Component {
           <Grid item xs={8}>
             <center><b>Description: </b>Use this tool to store any document on the Ethereum Blockchain
               <br /><br />If the file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later)
-              <br /><br />Estimated cost is below the upload box and is for blockchain gas only (no additional fees) 
+              <br /><br />Estimated cost is below the upload box and is for blockchain gas only (no additional fees)
            </center>
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
-            <br/><br/><b>Step 1: Select File</b><br/><br/>
+            <br /><br /><b>Step 1: Select File</b><br /><br />
             <Box border={1}>
               <center>
                 <Dropzone
@@ -682,7 +366,7 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             <label htmlFor="outlined-button-file">
-              <br/><br/><b>Step 2: Save to Ethereum Blockchain</b><br/><br/>
+              <br /><br /><b>Step 2: Save to Ethereum Blockchain</b><br /><br />
               <Button variant="outlined" component="span" disabled={this.state.savedBtnDisabled} onClick={this.onClickHandler}
                 // className={classes.button}
                 startIcon={<CloudUploadIcon />}>
@@ -693,20 +377,18 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
-          {this.state.loadingProgress ? (
-        <div><br/>Saving document to blockchain. Please wait (may take up to 15 mins).<br/><br/><br/><CircularProgress/></div>
-      ) : (
-       ""
-      )}
-          
+            {this.state.loadingProgress ? (
+              <div><br />Saving document to blockchain. Please wait (may take up to 15 mins).<br /><br /><br /><CircularProgress /></div>
+            ) : (
+                ""
+              )}
             {this.state.returnMessages.map((msg, index) => (
-          <div key={index}>
-            {Parser(msg)}
-          </div>
-        ))}
+              <div key={index}>
+                {Parser(msg)}
+              </div>
+            ))}
           </Grid>
           <Grid item xs={2}></Grid>
-          
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             <br />
@@ -718,27 +400,16 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
         </Grid>
         <Footer />
-
       </div>
     );
   }
 }
-
-// NewUpload.propTypes = {
-//   classes: PropTypes.object.isRequired,
-// };
 
 const mapStateToProps = state => {
   return {
     web3: state.web3.web3
   }
 }
-
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     buyCake: () => dispatch(buyCake())
-//   }
-// }
 
 export default connect(
   mapStateToProps,

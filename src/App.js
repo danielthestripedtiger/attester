@@ -18,6 +18,7 @@ import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
 import { storeWeb3 } from './redux'
 import store from './redux/store'
+import { setupEthPoll, getMetamaskWarning } from './Helper';
 
 var provider = "";
 var myWeb3 = "";
@@ -44,11 +45,11 @@ class App extends React.Component {
 
     // document.body.appendChild(script);
 
-    axios.get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
-      .then(res => {
-        console.log(res.data[0].price_usd);
-        this.setState({ etherPrice: res.data[0].price_usd });
-      });
+    // axios.get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
+    //   .then(res => {
+    //     console.log(res.data[0].price_usd);
+    //     this.setState({ etherPrice: res.data[0].price_usd });
+    //   });
 
     if (window.ethereum) {
   
@@ -81,40 +82,28 @@ class App extends React.Component {
           // Request account access if needed
           window.ethereum.enable();
 
-          var componentVar = this;
+          // var componentVar = this;
           var accountInterval = setInterval(() => {
-            // console.log("In internal");
-            var currentAccount = "";
-            myWeb3.eth.getAccounts().then(function (result) {
-              currentAccount = result[0];
-
-              // console.log("Current Account: " + currentAccount);
-              if (currentAccount !== account) {
-                account = currentAccount;
-                componentVar.setState({ selectedAccount: account });
-                console.log("Account: " + account);
-              }
-            });
-
-
+            setupEthPoll(this, false, window.ethereum.networkVersion);
           }, 100);
+          // var accountInterval = setInterval(() => {
+          //   // console.log("In internal");
+          //   var currentAccount = "";
+          //   myWeb3.eth.getAccounts().then(function (result) {
+          //     currentAccount = result[0];
+
+          //     // console.log("Current Account: " + currentAccount);
+          //     if (currentAccount !== account) {
+          //       account = currentAccount;
+          //       componentVar.setState({ selectedAccount: account });
+          //       console.log("Account: " + account);
+          //     }
+          //   });
+          // }, 100)
         } catch (error) {
           // User denied account access...
         }
-        this.setState({ selectedAccount: account });
-      
       }
-      // // Legacy dapp browsers...
-      // else if (window.web3) {
-      //   window.web3 = new Web3(window.web3.currentProvider);
-      //   // Acccounts always exposed
-
-      // }
-      // Non-dapp browsers...
-      else {
-        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      }
-      // });
     }
 
     
