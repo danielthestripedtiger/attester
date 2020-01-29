@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux'
-import NewUpload from './NewUpload'
-import PastUploads from './PastUploads'
+import NewUpload from './components/NewUpload'
+import PastUploads from './components/PastUploads'
 import {
   BrowserRouter,
   Switch,
@@ -15,7 +15,8 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import store from './redux/store'
-import { setupEthPoll } from './Helper';
+import { setupEthPoll } from './components/Helper';
+import ethsymbol from './images/ethsymbol.png';
 
 var myWeb3 = "";
 var account = "";
@@ -118,10 +119,11 @@ class App extends React.Component {
           <BrowserRouter basename={process.env.PUBLIC_URL}><div>
 
             <AppBar position="static">
-              <Grid container spacing={1}>
+              <Grid container spacing={3}>
                 <Grid item xs={8}>
                   <Typography variant="h4" component="h4" gutterBottom>
-                    Ethereum Blockchain Document Attestation
+                    {/* <img src={ethsymbol} alt="Ethereum Symbol" style={{width:'50px', height:'50px'}}/>*/}
+                    &nbsp;Ethereum Blockchain Document Attestation
                         </Typography></Grid>
                 <Grid item xs={4}>
                   <Paper >
@@ -140,10 +142,10 @@ class App extends React.Component {
             {/* A <Switch> looks through its children <Route>s and
     renders the first one that matches the current URL. */}
             <Switch>
-              <Route exact path = "/">
+              <Route exact path="/">
                 <NewUpload />
               </Route>
-              <Route path = "/pastuploads">
+              <Route path="/pastuploads">
                 <PastUploads />
               </Route>
             </Switch>
