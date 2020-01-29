@@ -123,7 +123,7 @@ class App extends React.Component {
                 <Grid item xs={8}>
                   <Typography variant="h4" component="h4" gutterBottom>
                     {/* <img src={ethsymbol} alt="Ethereum Symbol" style={{width:'50px', height:'50px'}}/>*/}
-                    &nbsp;Ethereum Blockchain Document Attestation
+                    &nbsp;Ethereum Document Attestation Tool
                         </Typography></Grid>
                 <Grid item xs={4}>
                   <Paper >
