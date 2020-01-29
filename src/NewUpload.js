@@ -12,6 +12,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import * as Constants from './Constants';
 import { setupEthPoll, getMetamaskWarning } from './Helper';
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 const sha3_512 = require('js-sha3').sha3_512;
 const Web3 = require('web3');
@@ -426,7 +427,7 @@ class NewUpload extends React.Component {
             <br />
             <br />
             <b>Next: </b>
-            <a href="/pastuploads">Manage Previously Uploaded Documents</a>
+            <Button color="primary" component={Link} to={'/pastuploads'}>Manage Previously Uploaded Documents</Button>
           </Grid>
           <Grid item xs={2}></Grid>
         </Grid>

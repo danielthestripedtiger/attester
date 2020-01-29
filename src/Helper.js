@@ -88,13 +88,13 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
                 var rows = [];
                 thisComponent.setState({ tableRows: rows });
 
-                var nonceVal = thisComponent.state.web3.eth.getTransactionCount(thisComponent.state.selectedAccount)
+                var nonceVal = thisComponent.state.web3.eth.getTransactionCount(currentAccount)
                     .then(nonceVal => {
 
-                        thisComponent.state.contract.methods.deleteBin(userSlot)
+                        thisContract.methods.deleteBin(userSlot)
                             .estimateGas(
                                 {
-                                    from: thisComponent.state.selectedAccount,
+                                    from: currentAccount,
                                     gasPrice: Constants.NEW_UPLOAD_GAS_PRICE,
                                     gasLimit: Constants.NEW_UPLOAD_GAS_LIMIT
                                 }, function (error, estimatedGas) {

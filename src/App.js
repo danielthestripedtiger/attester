@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux'
 import { Provider } from 'react-redux'
 import NewUpload from './NewUpload'
 import PastUploads from './PastUploads'
@@ -14,30 +13,19 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import AppBar from '@material-ui/core/AppBar';
-import Grid from '@material-ui/core/Grid';  
-import axios from 'axios';
-import { storeWeb3 } from './redux'
+import Grid from '@material-ui/core/Grid';
 import store from './redux/store'
-import { setupEthPoll, getMetamaskWarning } from './Helper';
+import { setupEthPoll } from './Helper';
 
-var provider = "";
 var myWeb3 = "";
 var account = "";
 var thisContract = "";
-var totalGasCost = "";
-var filePartsCount = "";
-const abi = [{ "constant": true, "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "name": "docBins", "outputs": [{ "internalType": "string", "name": "slot", "type": "string" }, { "internalType": "string", "name": "docLabel", "type": "string" }, { "internalType": "bytes32", "name": "docHash", "type": "bytes32" }, { "internalType": "string", "name": "docBin", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [{ "internalType": "string", "name": "slot", "type": "string" }], "name": "getDoc", "outputs": [{ "internalType": "string", "name": "", "type": "string" }, { "internalType": "string", "name": "", "type": "string" }, { "internalType": "bytes32", "name": "", "type": "bytes32" }, { "internalType": "string", "name": "", "type": "string" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "string", "name": "storageContainer", "type": "string" }, { "internalType": "string", "name": "slot", "type": "string" }, { "internalType": "string", "name": "docLabel", "type": "string" }], "name": "storeBin", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }]
-var http = require('http');
 const Web3 = require('web3');
-const fs = require('fs');
-var CryptoJS = require("crypto-js");
 
 class App extends React.Component {
 
-
   componentDidMount() {
     console.log("In CDM");
-
 
     // const script = document.createElement("script");
     // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
@@ -52,7 +40,7 @@ class App extends React.Component {
     //   });
 
     if (window.ethereum) {
-  
+
       // var subscription = myWeb3.eth.subscribe('logs', {
       //   address: '0x81FE72B5A8d1A857d176C3E7d5Bd2679A9B85763', fromBlock: 2,
       //   topics: ['0x296ba4ca62c6c21c95e828080cb8aec7481b71390585605300a8a76f9e95b527']
@@ -74,39 +62,39 @@ class App extends React.Component {
 
       // Modern dapp browsers...
 
-        myWeb3 = new Web3(Web3.givenProvider);
-        // storeWeb3(myWeb3);
-        this.setState({ web3: myWeb3 });
-        // store.web3 = myWeb3;
-        try {
-          // Request account access if needed
-          window.ethereum.enable();
+      myWeb3 = new Web3(Web3.givenProvider);
+      // storeWeb3(myWeb3);
+      this.setState({ web3: myWeb3 });
+      // store.web3 = myWeb3;
+      try {
+        // Request account access if needed
+        window.ethereum.enable();
 
-          // var componentVar = this;
-          var accountInterval = setInterval(() => {
-            setupEthPoll(this, false, window.ethereum.networkVersion);
-          }, 100);
-          // var accountInterval = setInterval(() => {
-          //   // console.log("In internal");
-          //   var currentAccount = "";
-          //   myWeb3.eth.getAccounts().then(function (result) {
-          //     currentAccount = result[0];
+        // var componentVar = this;
+        var accountInterval = setInterval(() => {
+          setupEthPoll(this, false, window.ethereum.networkVersion);
+        }, 100);
+        // var accountInterval = setInterval(() => {
+        //   // console.log("In internal");
+        //   var currentAccount = "";
+        //   myWeb3.eth.getAccounts().then(function (result) {
+        //     currentAccount = result[0];
 
-          //     // console.log("Current Account: " + currentAccount);
-          //     if (currentAccount !== account) {
-          //       account = currentAccount;
-          //       componentVar.setState({ selectedAccount: account });
-          //       console.log("Account: " + account);
-          //     }
-          //   });
-          // }, 100)
-        } catch (error) {
-          // User denied account access...
-        }
+        //     // console.log("Current Account: " + currentAccount);
+        //     if (currentAccount !== account) {
+        //       account = currentAccount;
+        //       componentVar.setState({ selectedAccount: account });
+        //       console.log("Account: " + account);
+        //     }
+        //   });
+        // }, 100)
+      } catch (error) {
+        // User denied account access...
       }
     }
+  }
 
-    
+
   constructor(props) {
     super(props);
     this.state = {
@@ -121,57 +109,50 @@ class App extends React.Component {
       metamaskWarning: ""
     }
   }
-  
+
 
   render() {
     return (
       <Provider store={store}>
-<div>
-        <BrowserRouter><div>
+        <div>
+          <BrowserRouter basename={process.env.PUBLIC_URL}><div>
 
-        <AppBar position="static">
-                    <Grid container spacing={1}>
-                        <Grid item xs={8}>
-                            <Typography variant="h4" component="h4" gutterBottom>
-                                Ethereum Blockchain Document Attestation
+            <AppBar position="static">
+              <Grid container spacing={1}>
+                <Grid item xs={8}>
+                  <Typography variant="h4" component="h4" gutterBottom>
+                    Ethereum Blockchain Document Attestation
                         </Typography></Grid>
-                        <Grid item xs={4}>
-                            <Paper >
-                                <b>Account:  {this.state.selectedAccount}</b>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} align='center' >
-                            <ButtonGroup variant="contained" aria-label="contained primary button group">
-                                <Button component={Link} to={'/'}>Home</Button>
-                                <Button component={Link} to={'/pastuploads'}>Past Uploads</Button>
-                            </ButtonGroup><br /><br /></Grid>
-                    </Grid>
-                </AppBar>
-                <br />
-             
+                <Grid item xs={4}>
+                  <Paper >
+                    <b>Account:  {this.state.selectedAccount}</b>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} align='center' >
+                  <ButtonGroup variant="contained" aria-label="contained primary button group">
+                    <Button component={Link} to={'/'}>Home</Button>
+                    <Button component={Link} to={'/pastuploads'}>Past Uploads</Button>
+                  </ButtonGroup><br /><br /></Grid>
+              </Grid>
+            </AppBar>
+            <br />
 
-      
-{/* A <Switch> looks through its children <Route>s and
+            {/* A <Switch> looks through its children <Route>s and
     renders the first one that matches the current URL. */}
-<Switch>
-<Route exact path="/">
-  <NewUpload/>
-  </Route>
-  <Route  path="/pastuploads" component={PastUploads} />
-
-</Switch>
-</div>
-</BrowserRouter>
-      </div>
+            <Switch>
+              <Route exact path = "/">
+                <NewUpload />
+              </Route>
+              <Route path = "/pastuploads">
+                <PastUploads />
+              </Route>
+            </Switch>
+          </div>
+          </BrowserRouter>
+        </div>
       </Provider>
     )
   }
 }
-
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     storeWeb3: web3 => dispatch(storeWeb3(web3))
-//   }
-// }
 
 export default App
