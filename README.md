@@ -1,3 +1,5 @@
+## Ethereum Document Attestation Tool
+
 Use this tool to store any document on the Ethereum Blockchain. Documents are never stored on our server and are simply passed along to Ethereum.
 
 If the file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later)
