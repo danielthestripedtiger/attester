@@ -13,6 +13,8 @@ import Parser from 'html-react-parser';
 import { setupEthPoll, getMetamaskWarning } from './Helper';
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import * as Constants from './Constants';
+import axios from 'axios';
 
 var myWeb3 = "";
 const Web3 = require('web3');
@@ -55,7 +57,7 @@ const useStyles = {
 class PastUploads extends Component {
 
   componentDidMount() {
-    console.log("In CDM");
+    console.log("In CDM - Past Uploads");
 
     // const script = document.createElement("script");
     // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
@@ -89,10 +91,15 @@ class PastUploads extends Component {
       // Request account access if needed
       window.ethereum.enable();
 
+      if (this.state.tableRows.length === 0) {
+        this.setState({
+          noDocsMsg: "No documents are saved on Ethereum"
+        })
+      }
+
       setTimeout(() => {
         setupEthPoll(this, true, window.ethereum.networkVersion);
       }, 1000);
-
 
       var accountInterval = setInterval(() => {
         setupEthPoll(this, true, window.ethereum.networkVersion);
@@ -108,7 +115,7 @@ class PastUploads extends Component {
 
       console.log("You clicked on row with userSlot " + userSlot + ", and buttonType " + buttonType);
 
-      if (buttonType === "DELETE") {
+      if (buttonType === Constants.DELETE_BTN) {
         console.log("DELETING ENTRY");
 
         this.setState({
@@ -122,7 +129,13 @@ class PastUploads extends Component {
 
             var thisComponent = this;
             this.state.contract.methods.deleteBin(userSlot)
-              .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then((res) => {
+              .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: Constants.PAST_UPLOADS_GAS_PRICE, gasLimit: Constants.PAST_UPLOADS_GAS_LIMIT }).then((res) => {
+
+                if ((thisComponent.state.tableRows.length - 1) === 0) {
+                  thisComponent.setState({
+                    noDocsMsg: "No documents are saved on Ethereum"
+                  })
+                }
 
                 var msgs = [];
                 msgs.push("<div><br/>Deletion of file successful. If you still see it in the list, wait at most 20 secs for the table to refresh. Transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
@@ -146,7 +159,7 @@ class PastUploads extends Component {
           })
       }
 
-      if (buttonType === "DOWNLOAD") {
+      if (buttonType === Constants.DOWNLOAD_BTN) {
         console.log("DOWNLOADING ENTRY");
 
         var thisComponent = this;
@@ -179,6 +192,11 @@ class PastUploads extends Component {
   constructor(props) {
     super(props);
 
+    axios.get(Constants.ETH_PRICE_API_URL)
+      .then(res => {
+        this.setState({ etherPrice: res.data[0].price_usd });
+      });
+
     this.state = {
       selectedFile: null,
       selectedFileName: "",
@@ -187,8 +205,10 @@ class PastUploads extends Component {
       metamaskWarning: "",
       tableRows: [],
       returnMessages: [],
-      loadingProgress: false
+      loadingProgress: false,
+      noDocsMsg: "No documents are saved on Ethereum"
     }
+
   }
 
   //DocumentName TimeStamp FullDocHash DownloadDocument/Download_NA_HashStoredOnly RemoveFromBlockchain
@@ -212,26 +232,31 @@ class PastUploads extends Component {
             <TableHead>
               <TableRow key="100">
                 <StyledTableCell>Document Name</StyledTableCell>
-                <StyledTableCell align="center" key="101">Timestamp</StyledTableCell>
-                <StyledTableCell align="center" key="102">Document Hash</StyledTableCell>
-                <StyledTableCell align="center" key="103">Download Document From Ethereum</StyledTableCell>
-                <StyledTableCell align="center" key="104">Remove From Ethereum</StyledTableCell>
+                <StyledTableCell align="center" >Timestamp</StyledTableCell>
+                <StyledTableCell align="center" >Document Hash</StyledTableCell>
+                <StyledTableCell align="center" >Download Document From Ethereum</StyledTableCell>
+                <StyledTableCell align="center" >Remove From Ethereum</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {this.state.tableRows.map(row => (
-                <StyledTableRow key="200">
+                <StyledTableRow>
                   <StyledTableCell component="th" scope="row">{Parser(row.filename)}</StyledTableCell>
-                  <StyledTableCell align="center" key="201">{row.timestamp}</StyledTableCell>
-                  <StyledTableCell align="center" key="202"><code>{row.filehash}</code></StyledTableCell>
-                  <StyledTableCell align="center" key="203">{row.download}</StyledTableCell>
-                  <StyledTableCell align="center" key="204">{row.deleteBtn}</StyledTableCell>
+                  <StyledTableCell align="center" >{row.timestamp}</StyledTableCell>
+                  <StyledTableCell align="center" ><code>{row.filehash}</code></StyledTableCell>
+                  <StyledTableCell align="center" >{row.download}</StyledTableCell>
+                  <StyledTableCell align="center" >{row.deleteBtn}</StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
         <Grid container spacing={3}>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8} align='center' >
+            <b>{this.state.noDocsMsg}</b>
+          </Grid>
+          <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             {this.state.loadingProgress ? (

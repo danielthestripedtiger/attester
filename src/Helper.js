@@ -3,6 +3,7 @@ import './App.css';
 import Button from '@material-ui/core/Button';
 import * as Constants from './Constants';
 import Alert from '@material-ui/lab/Alert';
+
 const Web3 = require('web3');
 
 function createData(filename, timestamp, filehash, download, deleteBtn) {
@@ -41,7 +42,7 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
             )
 
             break
-        case "4": 
+        case "4":
             //  console.log('This is the rinkeby test network.');
             blcExplUrl = Constants.RINKEBY_BLC_EXP_TX_URL;
             contrAddr = Constants.RINKEBY_DOCSTORE_CONTR_ADDR;
@@ -74,44 +75,64 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
         }
 
         if (pastUploadsPage === true) {
+
             var fileName = "";
             var fileHashFull = "";
             var lastUpdated = 0;
             var docNextSlot = 0;
             var userSlot = 0;
-            thisContract.methods.userNextSlot(currentAccount).call({ from: currentAccount }).then(function (resp1) {
+            thisContract.methods.userNextSlot(currentAccount).call({ from: currentAccount }).then(function (slotNum) {
 
-                // console.log("get user slot count: " + resp1);
+                console.log("get user slot count: " + slotNum);
 
                 var rows = [];
+                thisComponent.setState({ tableRows: rows });
 
-                for (var x = 0; x < resp1; x++) {
-                    thisContract.methods.getDocMetaData(x.toString()).call({ from: currentAccount }).then(function (resp) {
+                var nonceVal = thisComponent.state.web3.eth.getTransactionCount(thisComponent.state.selectedAccount)
+                    .then(nonceVal => {
 
-                        fileHashFull = resp[1];
+                        thisComponent.state.contract.methods.deleteBin(userSlot)
+                            .estimateGas(
+                                {
+                                    from: thisComponent.state.selectedAccount,
+                                    gasPrice: Constants.NEW_UPLOAD_GAS_PRICE,
+                                    gasLimit: Constants.NEW_UPLOAD_GAS_LIMIT
+                                }, function (error, estimatedGas) {
+                                }
+                            ).then((gasCost) => {
 
-                        if (fileHashFull !== "") {
-                            fileName = resp[0];
-                            lastUpdated = resp[2];
-                            docNextSlot = resp[3];
-                            userSlot = resp[4];
-                            // console.log("User Slot: " + userSlot);
+                                for (var x = 0; x < slotNum; x++) {
+                                    thisContract.methods.getDocMetaData(x.toString()).call({ from: currentAccount }).then(function (resp) {
 
-                            var lastUpdDatetime = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                            lastUpdDatetime.setUTCSeconds(lastUpdated);
+                                        fileHashFull = resp[1];
 
-                            var fileHash = [fileHashFull.slice(0, 60), " ", fileHashFull.slice(60)].join('');
+                                        if (fileHashFull !== "") {
+                                            fileName = resp[0];
+                                            lastUpdated = resp[2];
+                                            docNextSlot = resp[3];
+                                            userSlot = resp[4];
+                                            // console.log("fileName #" + userSlot + " : " + fileName);
 
-                            rows.push(
-                                createData(fileName + "<br/> (in slot #" + userSlot + ")", lastUpdDatetime.toString(), fileHash,
-                                    <Button onClick={thisComponent.onClickHandler(userSlot, "DOWNLOAD")} variant="contained" color="primary">Download</Button>,
-                                    <Button onClick={thisComponent.onClickHandler(userSlot, "DELETE")} variant="contained" color="primary">Delete</Button>),
-                            );
-                        }
-                        thisComponent.setState({ tableRows: rows });
-                    }
-                    )
-                }
+                                            var lastUpdDatetime = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                                            lastUpdDatetime.setUTCSeconds(lastUpdated);
+
+                                            var fileHash = [fileHashFull.slice(0, 60), " ", fileHashFull.slice(60)].join('');
+
+                                            var gasCostEth = thisComponent.state.web3.utils.fromWei(String(2000000000 * gasCost, 'ether'));
+                                            var gasCostUSD = (thisComponent.state.etherPrice * thisComponent.state.web3.utils.fromWei(String(2000000000 * gasCost, 'ether'))).toFixed(2);
+
+                                            rows.push(
+                                                createData(fileName + "<br/> (in slot #" + userSlot + ")", lastUpdDatetime.toString(), fileHash,
+                                                    <Button onClick={thisComponent.onClickHandler(userSlot, "DOWNLOAD")} variant="contained" color="primary">Download</Button>,
+                                                    <div><Button onClick={thisComponent.onClickHandler(userSlot, "DELETE")} variant="contained" color="primary">Delete</Button><small>ETH:{gasCostEth} USD:${gasCostUSD}</small></div>));
+
+                                            thisComponent.setState({ tableRows: rows, noDocsMsg: '' });
+                                        }
+                                    }
+                                    )
+                                }
+                            })
+                    })
             })
         }
     });

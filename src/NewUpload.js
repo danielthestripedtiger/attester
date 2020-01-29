@@ -4,7 +4,6 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Grid from '@material-ui/core/Grid';
-import axios from 'axios';
 import Dropzone from 'react-dropzone'
 import Footer from './Footer'
 import { connect } from 'react-redux'
@@ -12,6 +11,7 @@ import Parser from 'html-react-parser';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import * as Constants from './Constants';
 import { setupEthPoll, getMetamaskWarning } from './Helper';
+import axios from 'axios';
 
 const sha3_512 = require('js-sha3').sha3_512;
 const Web3 = require('web3');
@@ -63,7 +63,7 @@ var totalGasCost = "";
 class NewUpload extends React.Component {
 
   componentDidMount() {
-    console.log("In CDM");
+    console.log("In CDM - New Upload");
 
     // const script = document.createElement("script");
     // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
@@ -100,12 +100,6 @@ class NewUpload extends React.Component {
       // Request account access if needed
       window.ethereum.enable();
 
-      axios.get(Constants.ETH_PRICE_API_URL)
-        .then(res => {
-          console.log(res.data[0].price_usd);
-          this.setState({ etherPrice: res.data[0].price_usd });
-        });
-
       var accountInterval = setInterval(() => {
         setupEthPoll(this, false, window.ethereum.networkVersion);
       }, 1000);
@@ -122,6 +116,12 @@ class NewUpload extends React.Component {
 
   constructor(props) {
     super(props);
+
+    axios.get(Constants.ETH_PRICE_API_URL)
+    .then(res => {
+      this.setState({ etherPrice: res.data[0].price_usd });
+    });
+
     this.state = {
       selectedFile: null,
       selectedFileName: "",
@@ -146,13 +146,13 @@ class NewUpload extends React.Component {
       var fileBuffer = Buffer.from(buffer);
       var fileLength = fileBuffer.length;
       console.log("File Length1: " + fileLength);
-      var fileChunks = Math.ceil(fileLength / 3072);
-      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / 3072));
+      var fileChunks = Math.ceil(fileLength / Constants.FILE_CHUNK_SZ_BYTES);
+      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / Constants.FILE_CHUNK_SZ_BYTES));
 
       var batch = new this.state.web3.BatchRequest();
 
       var sliceStart = 0;
-      var sliceEnd = 3072;
+      var sliceEnd = Constants.FILE_CHUNK_SZ_BYTES;
 
       var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
         .then(nonceVal => {
@@ -174,8 +174,8 @@ class NewUpload extends React.Component {
             this.state.contract.methods.storeBin(base64str, acceptedFiles[0].name, sha3_512(fileBuffer), addFlag).estimateGas(
               {
                 from: this.state.selectedAccount,
-                gasPrice: "2000000000",
-                gasLimit: "5000000"
+                gasPrice: Constants.NEW_UPLOAD_GAS_PRICE,
+                gasLimit: Constants.NEW_UPLOAD_GAS_LIMIT
               }, function (error, estimatedGas) {
               }
             ).then(
@@ -206,8 +206,8 @@ class NewUpload extends React.Component {
               })
             });
 
-            sliceStart += 3072;
-            sliceEnd += 3072;
+            sliceStart += Constants.FILE_CHUNK_SZ_BYTES;
+            sliceEnd += Constants.FILE_CHUNK_SZ_BYTES;
             nonceVal++;
           }
 
@@ -235,13 +235,13 @@ class NewUpload extends React.Component {
       var fileBuffer = Buffer.from(buffer);
       var fileLength = fileBuffer.length;
       console.log("File Length: " + fileLength);
-      var fileChunks = Math.ceil(fileLength / 3072);
-      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / 3072));
+      var fileChunks = Math.ceil(fileLength / Constants.FILE_CHUNK_SZ_BYTES);
+      console.log("File Length div 4000 + ceiling: " + Math.ceil(fileLength / Constants.FILE_CHUNK_SZ_BYTES));
 
       var batch = new this.state.web3.BatchRequest();
 
       var sliceStart = 0;
-      var sliceEnd = 3072;
+      var sliceEnd = Constants.FILE_CHUNK_SZ_BYTES;
 
       var nonceVal = this.state.web3.eth.getTransactionCount(this.state.selectedAccount)
         .then(nonceVal => {
@@ -261,7 +261,8 @@ class NewUpload extends React.Component {
             // console.log(base64str);
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
             this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer), addFlag)
-              .send({ nonce: nonceVal, from: this.state.selectedAccount, gasPrice: "2000000000", gasLimit: "5000000" }).then(function (res) {
+              .send({ nonce: nonceVal, from: this.state.selectedAccount, 
+                gasPrice: Constants.NEW_UPLOAD_GAS_PRICE, gasLimit: Constants.NEW_UPLOAD_GAS_LIMIT}).then(function (res) {
 
                 filepartCount++;
                 thisComponent.state.returnMessages.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
@@ -301,8 +302,8 @@ class NewUpload extends React.Component {
             // .on('receipt', receipt => {
             //   console.log(receipt);})
 
-            sliceStart += 3072;
-            sliceEnd += 3072;
+            sliceStart += Constants.FILE_CHUNK_SZ_BYTES;
+            sliceEnd += Constants.FILE_CHUNK_SZ_BYTES;
             nonceVal++;
           }
           // batch.execute();
