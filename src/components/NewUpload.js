@@ -329,9 +329,9 @@ class NewUpload extends React.Component {
           <Grid item xs={3}></Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={8}>
-            <center><b>Description: </b>Use this tool to store any document on the Ethereum Blockchain
+            <center><b>Description: </b>Use this tool to store any document on the Ethereum Blockchain. Documents are never stored on our server and are simply passed along to Ethereum. Source code can be found <a href="https://github.com/danielthestripedtiger/attester" target="_blank">here</a>.
               <br /><br />If the file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later)
-              <br /><br />Estimated cost is below the upload box and is for blockchain gas only (no additional fees).
+              <br /><br />Estimated cost is below the upload box and is for blockchain gas only (no additional fees are charged)
               <br /><br /><b>Note 1: MetaMask will give a higher gas estimate than this page estimates. The MetaMask gas estimates are currently incorrect. Please disregard the MetaMask estimate and refer to the estimate on this site instead. We intend to work with the MetaMask team to get this addressed.</b>
               <br /><br /><b>Note 2: Ethereum cannot handle much more than 3kb of document data per block. Although this tool will split the file across multiple blocks, MetaMask will ask for manual approval on each file part. This would result in many manual approvals being required for large files. This is a MetaMask limitation and we will work with MetaMask to address this.</b>
             </center>
