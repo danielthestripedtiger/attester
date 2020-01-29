@@ -331,8 +331,9 @@ class NewUpload extends React.Component {
           <Grid item xs={8}>
             <center><b>Description: </b>Use this tool to store any document on the Ethereum Blockchain
               <br /><br />If the file is too big for a block on the chain, it will be split into multiple parts (which can be combined back later)
-              <br /><br />Estimated cost is below the upload box and is for blockchain gas only (no additional fees)
-           </center>
+              <br /><br />Estimated cost is below the upload box and is for blockchain gas only (no additional fees).
+              <br /><br /><b>Note: MetaMask will give a higher gas estimate. Please disregard that estimate and refer to the estimate on this site instead. We intend to work with the MetaMask team to get this addressed.</b>
+            </center>
           </Grid>
           <Grid item xs={2}></Grid>
           <Grid item xs={2}></Grid>
