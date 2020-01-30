@@ -456,7 +456,7 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             {this.state.loadingProgress ? (
-              <div><br />Making request...<br /><br /><br /><CircularProgress /></div>
+              <div><br />Processing transactions... (may take up to 15 minutes for transactions to be accepted)<br /><br /><br /><CircularProgress /></div>
             ) : (
                 ""
               )}

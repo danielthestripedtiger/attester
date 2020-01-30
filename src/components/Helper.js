@@ -11,7 +11,7 @@ function createData(filename, timestamp, filehash, download, deleteBtn) {
 }
 
 export function getMetamaskWarning(appState) {
-    var mmMissingMsg = <Alert severity="error"><center><div>This website Uses MetaMask and you dont seem to have it installed. Please install MetaMask and fill your account with sufficient Ether: <a href="https://metamask.io/">https://metamask.io</a>.</div></center></Alert>;
+    var mmMissingMsg = <Alert severity="error"><center><div>This website only works on the Google Chrome browser with the MetaMask plugin and you dont seem to have them both installed. Please install <a href="https://www.google.com/chrome/" target="_blank">Chrome</a> (if not already installed), then <a href="https://metamask.io/" target="_blank">MetaMask</a>, and fill your MetaMask account with sufficient Ether.<br/><br/>A complete guide to using Chrome with Metamask can be found <a href="https://medium.com/publicaio/a-complete-guide-to-using-metamask-updated-version-cd0d6f8c338f" target="_blank">here</a>.</div></center></Alert>;
 
     // <br/><br/>The Opera desktop browser (not mobile) is also supported.<a href="https://www.opera.com/">https://www.opera.com/</a>
     
