@@ -11,8 +11,10 @@ function createData(filename, timestamp, filehash, download, deleteBtn) {
 }
 
 export function getMetamaskWarning(appState) {
-    var mmMissingMsg = <Alert severity="error"><center><div>This website Uses MetaMask and you dont seem to have it installed. Please install MetaMask and fill your account with sufficient Ether: <a href="https://metamask.io/">https://metamask.io</a>.<br/><br/>The Opera desktop browser (not mobile) is also supported.<a href="https://www.opera.com/">https://www.opera.com/</a></div></center></Alert>;
+    var mmMissingMsg = <Alert severity="error"><center><div>This website Uses MetaMask and you dont seem to have it installed. Please install MetaMask and fill your account with sufficient Ether: <a href="https://metamask.io/">https://metamask.io</a>.</div></center></Alert>;
 
+    // <br/><br/>The Opera desktop browser (not mobile) is also supported.<a href="https://www.opera.com/">https://www.opera.com/</a>
+    
     appState.setState(
         {
             metamaskWarning: mmMissingMsg
