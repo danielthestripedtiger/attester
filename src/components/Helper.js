@@ -31,7 +31,7 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
 
     switch (netId) {
         case "1":
-            //  console.log('This is mainnet');
+            console.log('This is mainnet');
             blcExplUrl = Constants.MAIN_BLC_EXP_TX_URL;
             contrAddr = Constants.MAIN_DOCSTORE_CONTR_ADDR;
             thisComponent.setState(
@@ -43,7 +43,7 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
 
             break
         case "4":
-            //  console.log('This is the rinkeby test network.');
+            // console.log('This is the rinkeby test network.');
             blcExplUrl = Constants.RINKEBY_BLC_EXP_TX_URL;
             contrAddr = Constants.RINKEBY_DOCSTORE_CONTR_ADDR;
             // console.log(contrAddr);
@@ -76,6 +76,8 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
 
         if (pastUploadsPage === true) {
 
+            thisComponent.setState({ noDocsMsg: 'No documents are saved on Ethereum. If you just submitted a save request, you may have to wait up to 15 minutes for it to be confirmed on the chain.' });
+                            
             var fileName = "";
             var fileHashFull = "";
             var lastUpdated = 0;
@@ -126,11 +128,15 @@ export function setupEthPoll(thisComponent, pastUploadsPage, netId) {
                                                     <Button onClick={thisComponent.onClickHandler(userSlot, "DOWNLOAD")} variant="contained" color="primary">Download</Button>,
                                                     <div><Button onClick={thisComponent.onClickHandler(userSlot, "DELETE")} variant="contained" color="primary">Delete</Button><small>ETH:{gasCostEth} USD:${gasCostUSD}</small></div>));
 
-                                            thisComponent.setState({ tableRows: rows, noDocsMsg: '' });
+                                            thisComponent.setState({ tableRows: rows, noDocsMsg: '', loadingFilesProgress: false });
                                         }
                                     }
                                     )
                                 }
+
+                                thisComponent.setState({
+                                    loadingFilesProgress: false,
+                                  });
                             })
                     })
             })

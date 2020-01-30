@@ -13,6 +13,12 @@ import * as Constants from './Constants';
 import { setupEthPoll, getMetamaskWarning } from './Helper';
 import axios from 'axios';
 import { Link } from "react-router-dom";
+import {
+  BrowserView,
+  MobileView,
+  isBrowser,
+  isMobile
+} from "react-device-detect";
 
 const sha3_512 = require('js-sha3').sha3_512;
 const Web3 = require('web3');
@@ -40,7 +46,8 @@ const styles = theme => ({
 // var encrypted = CryptoJS.AES.encrypt("[PK HERE]", "SecretPassphrase");
 //  window.localStorage.setItem("pkey",encrypted);
 
-var myWeb3 = "";
+var netId = "";
+var myWeb3 = new Web3(Web3.givenProvider);
 var thisContract = "";
 var totalGasCost = "";
 
@@ -102,7 +109,7 @@ class NewUpload extends React.Component {
       window.ethereum.enable();
 
       var accountInterval = setInterval(() => {
-        setupEthPoll(this, false, window.ethereum.networkVersion);
+        setupEthPoll(this, false, netId.toString());
       }, 1000);
 
     } else {
@@ -118,10 +125,16 @@ class NewUpload extends React.Component {
   constructor(props) {
     super(props);
 
+    if(Web3.givenProvider != null){
+      myWeb3.eth.net.getId().then(function (id) {
+        netId = id;
+      });
+    }
+
     axios.get(Constants.ETH_PRICE_API_URL)
-    .then(res => {
-      this.setState({ etherPrice: res.data[0].price_usd });
-    });
+      .then(res => {
+        this.setState({ etherPrice: res.data[0].price_usd });
+      });
 
     this.state = {
       selectedFile: null,
@@ -136,7 +149,19 @@ class NewUpload extends React.Component {
     }
   }
 
-  onDrop = (acceptedFiles) => {
+  onDrop = (event) => {
+
+    var acceptedFiles = [];
+
+    if (event.target != null) {
+      acceptedFiles.push(event.target.files[0]);
+    } else if (event[0] != null) {
+      acceptedFiles = event;
+    }
+
+    this.setState({
+      loadingFileProgress: true,
+    });
 
     console.log(acceptedFiles[0]);
     const fileAsBlob = new Blob([acceptedFiles[0]]);
@@ -190,7 +215,7 @@ class NewUpload extends React.Component {
                   selectedFile: acceptedFiles[0],
                   savedBtnDisabled: false,
                   returnMessages: [],
-                  loadingProgress: false
+                  loadingFileProgress: false
                 })
               }
             ).catch((err) => {
@@ -203,7 +228,7 @@ class NewUpload extends React.Component {
                 selectedFile: acceptedFiles[0],
                 savedBtnDisabled: true,
                 returnMessages: msgs,
-                loadingProgress: false
+                loadingFileProgress: false
               })
             });
 
@@ -262,8 +287,10 @@ class NewUpload extends React.Component {
             // console.log(base64str);
             //string memory dataStr, string memory inpDocLabel, string memory inpDocHash, uint argFlag
             this.state.contract.methods.storeBin(base64str, this.state.selectedFile.name, sha3_512(fileBuffer), addFlag)
-              .send({ nonce: nonceVal, from: this.state.selectedAccount, 
-                gasPrice: Constants.NEW_UPLOAD_GAS_PRICE, gasLimit: Constants.NEW_UPLOAD_GAS_LIMIT}).then(function (res) {
+              .send({
+                nonce: nonceVal, from: this.state.selectedAccount,
+                gasPrice: Constants.NEW_UPLOAD_GAS_PRICE, gasLimit: Constants.NEW_UPLOAD_GAS_LIMIT
+              }).then(function (res) {
 
                 filepartCount++;
                 thisComponent.state.returnMessages.push("<div><br/>File part " + filepartCount + " transaction hash: <a href = '" + thisComponent.state.blcExplUrl + res.transactionHash + "' target='_blank'>" + res.transactionHash + "</a></div>");
@@ -340,40 +367,57 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             <br /><br /><b>Step 1: Select File</b><br /><br />
-            <Box border={1}>
-              <center>
-                <Dropzone
-                  onDrop={this.onDrop}
-                  minSize={0}
-                  maxSize={50000000000}
-                  disabled={this.state.dropzoneDisabledFlg}
-                >
-                  {({ getRootProps, getInputProps, isDragActive, isDragReject, rejectedFiles }) => {
-                    const isFileTooLarge = rejectedFiles.length > 0 && rejectedFiles[0].size > 50000000000;
-                    return (
-                      <div {...getRootProps()}>
-                        <br /><br /><br />
-                        <input {...getInputProps()} />
-                        {!isDragActive && 'Click here or drop a file to upload!'}
-                        {isDragActive && !isDragReject && "Drop it like it's hot!"}
-                        {isDragReject && "File type not accepted, sorry!"}
-                        {isFileTooLarge && (
-                          <div className="text-danger mt-2">
-                            File is too large.
-                </div>
-                        )}
-                        <br /><br /><br /><br />
-                      </div>
-                    )
-                  }
-                  }
-                </Dropzone>
-              </center>
-            </Box>
+            <BrowserView>
+              <Box border={1}>
+                <center>
+                  <Dropzone
+                    onDrop={this.onDrop}
+                    minSize={0}
+                    maxSize={50000000000}
+                    disabled={this.state.dropzoneDisabledFlg}
+                  >
+                    {({ getRootProps, getInputProps, isDragActive, isDragReject, rejectedFiles }) => {
+                      const isFileTooLarge = rejectedFiles.length > 0 && rejectedFiles[0].size > 50000000000;
+                      return (
+                        <div {...getRootProps()}>
+                          <br /><br /><br />
+                          <input {...getInputProps()} />
+                          {!isDragActive && 'Click here or drop a file to upload!'}
+                          {isDragActive && !isDragReject && "Drop it like it's hot!"}
+                          {isDragReject && "File type not accepted, sorry!"}
+                          {isFileTooLarge && (
+                            <div className="text-danger mt-2">
+                              File is too large.
+                        </div>
+                          )}
+                          <br /><br /><br /><br />
+                        </div>
+                      )
+                    }
+                    }
+                  </Dropzone>
+                </center>
+              </Box>
+            </BrowserView>
+            <MobileView>
+              <div>
+                {this.state.dropzoneDisabledFlg ? (
+                  <input type="file" onChange={this.onDrop} disabled />
+                ) : (
+                    <input type="file" onChange={this.onDrop} />
+                  )}
+              </div>
+            </MobileView>
           </Grid>
+
           <Grid item xs={2}></Grid>
-          <Grid item xs={2}></Grid>
+          <Grid item xs={2} align='center' ></Grid>
           <Grid item xs={8} align='center' >
+            {this.state.loadingFileProgress ? (
+              <div><br />Calculating gas costs...<br /><br /><br /><CircularProgress /><br /><br /><br /></div>
+            ) : (
+                ""
+              )}
             File Selected: {this.state.selectedFileName}
           </Grid>
           <Grid item xs={2}></Grid>
@@ -412,7 +456,7 @@ class NewUpload extends React.Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             {this.state.loadingProgress ? (
-              <div><br />Saving document to blockchain. Please wait (may take up to 15 mins).<br /><br /><br /><CircularProgress /></div>
+              <div><br />Making request...<br /><br /><br /><CircularProgress /></div>
             ) : (
                 ""
               )}

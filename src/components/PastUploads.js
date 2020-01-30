@@ -16,7 +16,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import * as Constants from './Constants';
 import axios from 'axios';
 
-var myWeb3 = "";
 const Web3 = require('web3');
 
 const StyledTableCell = withStyles(theme => ({
@@ -53,11 +52,17 @@ const useStyles = {
   }
 };
 
+var netId = "";
+var myWeb3 = new Web3(Web3.givenProvider);
 
 class PastUploads extends Component {
 
   componentDidMount() {
     console.log("In CDM - Past Uploads");
+
+    this.setState({
+      loadingFilesProgress: true,
+    });
 
     // const script = document.createElement("script");
     // script.src = "https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js";
@@ -91,22 +96,26 @@ class PastUploads extends Component {
       // Request account access if needed
       window.ethereum.enable();
 
-      if (this.state.tableRows.length === 0) {
-        this.setState({
-          noDocsMsg: "No documents are saved on Ethereum"
-        })
-      }
+      // if (this.state.tableRows.length === 0) {
+      //   this.setState({
+      //     noDocsMsg: "No documents are saved on Ethereum"
+      //   })
+      // }
 
       setTimeout(() => {
-        setupEthPoll(this, true, window.ethereum.networkVersion);
+        setupEthPoll(this, true, netId.toString());
       }, 1000);
 
       var accountInterval = setInterval(() => {
-        setupEthPoll(this, true, window.ethereum.networkVersion);
+        setupEthPoll(this, true, netId.toString());
       }, 20000);
 
     } else {
       getMetamaskWarning(this);
+      
+      this.setState({
+        loadingFilesProgress: false,
+      });
     }
   }
 
@@ -192,6 +201,12 @@ class PastUploads extends Component {
   constructor(props) {
     super(props);
 
+    if(Web3.givenProvider != null){
+      myWeb3.eth.net.getId().then(function (id) {
+        netId = id;
+      });
+    }
+
     axios.get(Constants.ETH_PRICE_API_URL)
       .then(res => {
         this.setState({ etherPrice: res.data[0].price_usd });
@@ -206,7 +221,8 @@ class PastUploads extends Component {
       tableRows: [],
       returnMessages: [],
       loadingProgress: false,
-      noDocsMsg: "No documents are saved on Ethereum"
+      loadingFilesProgress: false,
+      noDocsMsg: ""
     }
 
   }
@@ -260,7 +276,7 @@ class PastUploads extends Component {
           <Grid item xs={2}></Grid>
           <Grid item xs={8} align='center' >
             {this.state.loadingProgress ? (
-              <div><br />Deleting from Ethereum. Please wait (may take up to 15 mins).<br /><br /><br /><CircularProgress /></div>
+              <div><br />Sending delete transaction...<br /><br /><br /><CircularProgress /></div>
             ) : (
                 ""
               )}
@@ -269,6 +285,15 @@ class PastUploads extends Component {
                 {Parser(msg)}
               </div>
             ))}
+          </Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8} align='center' >
+            {this.state.loadingFilesProgress ? (
+              <div>Retrieving File Data...<br /><br /><br /><CircularProgress /></div>
+            ) : (
+                ""
+              )}
           </Grid>
           <Grid item xs={2}></Grid>
         </Grid>

@@ -54,6 +54,7 @@ npm install redux-logger
 npm install js-sha3
 npm install html-react-parser
 npm install gh-pages --save-dev
+npm install react-device-detect --save
 
 follow instruction here:
 https://dev.to/yuribenjamin/how-to-deploy-react-app-in-github-pages-2a1f
